@@ -17,7 +17,7 @@ func TestSuccessfulLookup(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	var args = "foo.go --network 81.2.69.142 --db ../../test/data/test-data/GeoIP2-City-Test.mmdb"
+	var args = "foo.go --db ../../test/data/test-data/GeoIP2-City-Test.mmdb 81.2.69.142"
 	os.Args = strings.Split(args, " ")
 
 	main()
