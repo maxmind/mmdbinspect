@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/oalders/mmdbinspect/pkg/mmdbinspect"
 )
@@ -12,7 +13,7 @@ import (
 type arrayFlags []string
 
 func (i *arrayFlags) String() string {
-	return "my string representation"
+	return strings.Join(*i, ", ")
 }
 
 func (i *arrayFlags) Set(value string) error {
