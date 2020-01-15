@@ -3,7 +3,6 @@ module github.com/oalders/mmdbinspect
 go 1.13
 
 require (
-	github.com/davecgh/go-spew v1.1.0
 	github.com/oalders/maxminddb-golang v1.5.0
 	github.com/oschwald/maxminddb-golang v1.5.0 // indirect
 	github.com/pkg/errors v0.8.1
