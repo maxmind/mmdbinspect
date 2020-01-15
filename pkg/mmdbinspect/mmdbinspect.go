@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/oalders/maxminddb-golang"
+	"github.com/oschwald/maxminddb-golang"
 	"github.com/pkg/errors"
 )
 

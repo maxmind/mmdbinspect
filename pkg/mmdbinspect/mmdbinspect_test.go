@@ -3,7 +3,7 @@ package mmdbinspect
 import (
 	"testing"
 
-	"github.com/oalders/maxminddb-golang"
+	"github.com/oschwald/maxminddb-golang"
 	"github.com/stretchr/testify/assert"
 )
 
