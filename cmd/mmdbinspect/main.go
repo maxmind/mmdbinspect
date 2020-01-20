@@ -69,5 +69,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("%v", json)
+	fmt.Printf("%v\n", json)
 }
