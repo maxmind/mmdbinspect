@@ -89,13 +89,12 @@ func AggregatedRecords(networks []string, databases []string) (interface{}, erro
 
 	for _, path := range databases {
 		reader, err := OpenDB(path)
+		if err != nil {
+			return nil, errors.WithMessagef(err, "could not open database %v", path)
+		}
 		defer reader.Close()
 
 		for _, thisNetwork := range networks {
-			if err != nil {
-				return nil, errors.WithMessagef(err, "could not open database %v", path)
-			}
-
 			var records interface{}
 			records, err = RecordsForNetwork(*reader, thisNetwork)
 
