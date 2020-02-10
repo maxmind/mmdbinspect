@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/oalders/mmdbinspect/pkg/mmdbinspect"
+	"github.com/maxmind/mmdbinspect/pkg/mmdbinspect"
 )
 
 type arrayFlags []string
