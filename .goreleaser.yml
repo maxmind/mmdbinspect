@@ -1,0 +1,63 @@
+project_name: 'mmdbinspect'
+
+env:
+  - 'GO111MODULE=on'
+
+before:
+  hooks:
+    - 'go mod tidy'
+
+builds:
+  - id: 'mmdbinspect'
+    main: './cmd/mmdbinspect/main.go'
+    binary: 'mmdbinspect'
+    goos:
+      - 'darwin'
+      - 'linux'
+      - 'windows'
+    ignore:
+      - goos: 'darwin'
+        goarch: '386'
+
+archives:
+  - id: 'mmdbinspect'
+    builds:
+      - 'mmdbinspect'
+    replacements:
+      darwin: 'Darwin'
+      linux: 'Linux'
+      windows: 'Windows'
+      386: 'i386'
+      amd64: 'x86_64'
+    wrap_in_directory: true
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+changelog:
+  skip: true
+
+nfpms:
+  - id: 'mmdbinspect'
+    builds:
+      - 'mmdbinspect'
+    vendor: 'MaxMind, Inc.'
+    homepage: 'https://www.maxmind.com/'
+    maintainer: 'MaxMind, Inc. <support@maxmind.com>'
+    description: 'Program to look up records for one or more IPs/networks in one or more .mmdb databases.'
+    license: 'Apache 2.0 or MIT'
+    formats:
+      - 'deb'
+      - 'rpm'
+    bindir: '/usr/bin'
+    files:
+      'CHANGELOG.md': '/usr/share/doc/mmdbinspect/CHANGELOG.md'
+      'LICENSE-APACHE': '/usr/share/doc/mmdbinspect/LICENSE-APACHE'
+      'LICENSE-MIT': '/usr/share/doc/mmdbinspect/LICENSE-MIT'
+      'README.md': '/usr/share/doc/mmdbinspect/README.md'
