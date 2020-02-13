@@ -1,4 +1,4 @@
-module github.com/oalders/mmdbinspect
+module github.com/maxmind/mmdbinspect
 
 go 1.13
 
