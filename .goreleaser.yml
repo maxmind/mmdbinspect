@@ -27,6 +27,11 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
+    files:
+      - 'CHANGELOG.md'
+      - 'LICENSE-APACHE'
+      - 'LICENSE-MIT'
+      - 'README.md'
 
 checksum:
   name_template: 'checksums.txt'
