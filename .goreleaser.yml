@@ -23,12 +23,6 @@ archives:
   - id: 'mmdbinspect'
     builds:
       - 'mmdbinspect'
-    replacements:
-      darwin: 'Darwin'
-      linux: 'Linux'
-      windows: 'Windows'
-      386: 'i386'
-      amd64: 'x86_64'
     wrap_in_directory: true
     format_overrides:
       - goos: windows
