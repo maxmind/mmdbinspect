@@ -5,6 +5,25 @@
 [![Build Status](https://github.com/maxmind/mmdbinspect/workflows/Build/badge.svg)](https://github.com/maxmind/mmdbinspect/actions?query=workflow%3A%22Build%22)
 [![Coverage Status](https://coveralls.io/repos/github/maxmind/mmdbinspect/badge.svg)](https://coveralls.io/github/maxmind/mmdbinspect)
 
+<!-- vim-markdown-toc GFM -->
+
+* [Usage](#usage)
+* [Description](#description)
+* [Beta Release](#beta-release)
+* [Installation](#installation)
+    * [Installing via binary release](#installing-via-binary-release)
+    * [Installing on Linux via the tarball](#installing-on-linux-via-the-tarball)
+    * [Installing on Ubuntu or Debian via the .deb](#installing-on-ubuntu-or-debian-via-the-deb)
+    * [Installing on RedHat or CentOS via the rpm](#installing-on-redhat-or-centos-via-the-rpm)
+    * [Installing on macOS (darwin) via the tarball](#installing-on-macos-darwin-via-the-tarball)
+    * [Installing on Windows](#installing-on-windows)
+    * [Installing from source or Git](#installing-from-source-or-git)
+* [Examples](#examples)
+* [Bug Reports](#bug-reports)
+* [Copyright and License](#copyright-and-license)
+
+<!-- vim-markdown-toc -->
+
 ## Usage
 
 ```bash
