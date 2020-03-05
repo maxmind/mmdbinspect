@@ -370,7 +370,7 @@ $ mmdbinspect -db GeoIP2-Static-IP-Score-Test.mmdb -db GeoIP2-User-Count-Test.mm
 </details>
 
 <details>
-    <summary>Look up a file of IPs/networks using the `xargs` utility</summary>
+    <summary>Look up a file of IPs/networks using the <code>xargs</code> utility</summary>
 
 ```bash
 $ cat list.txt
@@ -409,7 +409,7 @@ $ cat list.txt | xargs mmdbinspect -db GeoIP2-DensityIncome-Test.mmdb
 </details>
 
 <details>
-<summary>Tame the output with the `jq` utility</summary>
+<summary>Tame the output with the <code>jq</code> utility</summary>
 
 ```bash
 $ mmdbinspect -db GeoIP2-ISP-Test.mmdb 5.145.96.0 | jq '.[] | .Records[].Record.isp'
