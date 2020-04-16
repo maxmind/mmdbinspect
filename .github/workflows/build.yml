@@ -8,9 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go-version: ['1.12.x', '1.13.x']
+        go-version: ['1.13.x', '1.14.x']
         include:
-          - go-version: '1.13.x'
+          - go-version: '1.14.x'
             build-coverage: true
     steps:
       - name: Set up Go
