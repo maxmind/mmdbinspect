@@ -423,9 +423,48 @@ $ cat list.txt | xargs mmdbinspect -db GeoIP2-ISP.mmdb
 <details>
 <summary>Tame the output with the <code>jq</code> utility</summary>
 
+Print out the `isp` field from each result found:
 ```bash
-$ mmdbinspect -db GeoIP2-ISP-Test.mmdb 5.145.96.0 | jq '.[] | .Records[].Record.isp'
-"Finecom"
+$ mmdbinspect -db GeoIP2-ISP.mmdb 152.216.7.32/27 | jq -r '.[].Records[].Record.isp'
+Internal Revenue Service
+```
+
+Print out the `isp` field from each result found in a specific format using string addition:
+```bash
+$ mmdbinspect -db GeoIP2-ISP.mmdb 152.216.7.32/27 | jq -r '.[].Records[].Record | "isp=" + .isp'
+isp=Internal Revenue Service
+```
+
+Print out the `city` and `country` names from each record using string addition:
+```bash
+$ mmdbinspect -db GeoIP2-City.mmdb 2610:30::/64 | jq -r '.[].Records[].Record | .city.names.en + ", " + .country.names.en'
+Martinsburg, United States
+```
+
+Print out the `city` and `country` names from each record using array construction and `join`:
+```bash
+$ mmdbinspect -db GeoIP2-City.mmdb 2610:30::/64 | jq -r '.[].Records[].Record | [.city.names.en, .country.names.en] | join(", ")'
+Martinsburg, United States
+```
+
+Get the AS number for an IP:
+```bash
+mmdbinspect -db GeoLite2-ASN.mmdb 152.216.7.49 | jq -r '.[].Records[].Record.autonomous_system_number'
+30313
+```
+
+When asking `jq` to print a path it can't find, it'll print `null`:
+```bash
+$ mmdbinspect -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.[].invalid.path'
+null
+```
+
+When asking `jq` to concatenate or join a path it can't find, it'll leave it blank:
+```bash
+$ mmdbinspect -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.[].Records[].Record | .city.names.en + ", " + .country.names.en'
+, United States
+$ mmdbinspect -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.[].Records[].Record | [.city.names.en, .country.names.en] | join(", ")'
+, United States
 ```
 </details>
 
