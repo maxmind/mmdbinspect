@@ -449,7 +449,7 @@ Martinsburg, United States
 
 Get the AS number for an IP:
 ```bash
-mmdbinspect -db GeoLite2-ASN.mmdb 152.216.7.49 | jq -r '.[].Records[].Record.autonomous_system_number'
+$ mmdbinspect -db GeoLite2-ASN.mmdb 152.216.7.49 | jq -r '.[].Records[].Record.autonomous_system_number'
 30313
 ```
 
