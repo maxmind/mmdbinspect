@@ -95,26 +95,64 @@ This installs `mmdbinspect` to `$GOPATH/bin/mmdbinspect`.
 
 ## Examples
 
-The following examples were created using our test databases which can be found in `test/data` in this repository.
-
 <details>
     <summary>A simple lookup (one IP/network, one DB)</summary>
 
 ```bash
-$ mmdbinspect -db GeoIP2-Anonymous-IP-Test.mmdb 71.160.223.3
+$ mmdbinspect -db GeoIP2-Country.mmdb 152.216.7.110
 [
     {
-        "Database": "GeoIP2-Anonymous-IP-Test.mmdb",
+        "Database": "GeoIP2-Country.mmdb",
         "Records": [
             {
-                "Network": "71.160.223.3/24",
+                "Network": "152.216.7.110/12",
                 "Record": {
-                    "is_anonymous": true,
-                    "is_hosting_provider": true
+                    "continent": {
+                        "code": "NA",
+                        "geoname_id": 6255149,
+                        "names": {
+                            "de": "Nordamerika",
+                            "en": "North America",
+                            "es": "Norteamérica",
+                            "fr": "Amérique du Nord",
+                            "ja": "北アメリカ",
+                            "pt-BR": "América do Norte",
+                            "ru": "Северная Америка",
+                            "zh-CN": "北美洲"
+                        }
+                    },
+                    "country": {
+                        "geoname_id": 6252001,
+                        "iso_code": "US",
+                        "names": {
+                            "de": "USA",
+                            "en": "United States",
+                            "es": "Estados Unidos",
+                            "fr": "États-Unis",
+                            "ja": "アメリカ合衆国",
+                            "pt-BR": "Estados Unidos",
+                            "ru": "США",
+                            "zh-CN": "美国"
+                        }
+                    },
+                    "registered_country": {
+                        "geoname_id": 6252001,
+                        "iso_code": "US",
+                        "names": {
+                            "de": "USA",
+                            "en": "United States",
+                            "es": "Estados Unidos",
+                            "fr": "États-Unis",
+                            "ja": "アメリカ合衆国",
+                            "pt-BR": "Estados Unidos",
+                            "ru": "США",
+                            "zh-CN": "美国"
+                        }
+                    }
                 }
             }
         ],
-        "Lookup": "71.160.223.3"
+        "Lookup": "152.216.7.110"
     }
 ]
 ```
@@ -124,57 +162,29 @@ $ mmdbinspect -db GeoIP2-Anonymous-IP-Test.mmdb 71.160.223.3
     <summary>Look up one IP/network in multiple databases</summary>
 
 ```bash
-$ mmdbinspect -db GeoIP2-Country-Test.mmdb -db GeoIP2-City-Test.mmdb 202.196.224.4
+$ mmdbinspect -db GeoIP2-Country.mmdb -db GeoIP2-City.mmdb 152.216.7.110
 [
     {
-        "Database": "GeoIP2-Country-Test.mmdb",
+        "Database": "GeoIP2-Country.mmdb",
         "Records": [
             {
-                "Network": "202.196.224.4/20",
+                "Network": "152.216.7.110/12",
                 "Record": {
                     "continent": {
-                        "code": "AS",
-                        "geoname_id": 6255147,
+                        "code": "NA",
+                        "geoname_id": 6255149,
                         "names": {
-                            "de": "Asien",
-                            "en": "Asia",
-                            "es": "Asia",
-                            "fr": "Asie",
-                            "ja": "アジア",
-                            "pt-BR": "Ásia",
-                            "ru": "Азия",
-                            "zh-CN": "亚洲"
+                            "de": "Nordamerika",
+                            "en": "North America",
+                            "es": "Norteamérica",
+                            "fr": "Amérique du Nord",
+                            "ja": "北アメリカ",
+                            "pt-BR": "América do Norte",
+                            "ru": "Северная Америка",
+                            "zh-CN": "北美洲"
                         }
                     },
                     "country": {
-                        "geoname_id": 1694008,
-                        "iso_code": "PH",
-                        "names": {
-                            "de": "Philippinen",
-                            "en": "Philippines",
-                            "es": "Filipinas",
-                            "fr": "Philippines",
-                            "ja": "フィリピン共和国",
-                            "pt-BR": "Filipinas",
-                            "ru": "Филиппины",
-                            "zh-CN": "菲律宾"
-                        }
-                    },
-                    "registered_country": {
-                        "geoname_id": 1694008,
-                        "iso_code": "PH",
-                        "names": {
-                            "de": "Philippinen",
-                            "en": "Philippines",
-                            "es": "Filipinas",
-                            "fr": "Philippines",
-                            "ja": "フィリピン共和国",
-                            "pt-BR": "Filipinas",
-                            "ru": "Филиппины",
-                            "zh-CN": "菲律宾"
-                        }
-                    },
-                    "represented_country": {
                         "geoname_id": 6252001,
                         "iso_code": "US",
                         "names": {
@@ -186,72 +196,68 @@ $ mmdbinspect -db GeoIP2-Country-Test.mmdb -db GeoIP2-City-Test.mmdb 202.196.224
                             "pt-BR": "Estados Unidos",
                             "ru": "США",
                             "zh-CN": "美国"
-                        },
-                        "type": "military"
+                        }
+                    },
+                    "registered_country": {
+                        "geoname_id": 6252001,
+                        "iso_code": "US",
+                        "names": {
+                            "de": "USA",
+                            "en": "United States",
+                            "es": "Estados Unidos",
+                            "fr": "États-Unis",
+                            "ja": "アメリカ合衆国",
+                            "pt-BR": "Estados Unidos",
+                            "ru": "США",
+                            "zh-CN": "美国"
+                        }
                     }
                 }
             }
         ],
-        "Lookup": "202.196.224.4"
+        "Lookup": "152.216.7.110"
     },
     {
-        "Database": "GeoIP2-City-Test.mmdb",
+        "Database": "GeoIP2-City.mmdb",
         "Records": [
             {
-                "Network": "202.196.224.4/20",
+                "Network": "152.216.7.110/14",
                 "Record": {
                     "continent": {
-                        "code": "AS",
-                        "geoname_id": 6255147,
+                        "code": "NA",
+                        "geoname_id": 6255149,
                         "names": {
-                            "de": "Asien",
-                            "en": "Asia",
-                            "es": "Asia",
-                            "fr": "Asie",
-                            "ja": "アジア",
-                            "pt-BR": "Ásia",
-                            "ru": "Азия",
-                            "zh-CN": "亚洲"
+                            "de": "Nordamerika",
+                            "en": "North America",
+                            "es": "Norteamérica",
+                            "fr": "Amérique du Nord",
+                            "ja": "北アメリカ",
+                            "pt-BR": "América do Norte",
+                            "ru": "Северная Америка",
+                            "zh-CN": "北美洲"
                         }
                     },
                     "country": {
-                        "geoname_id": 1694008,
-                        "iso_code": "PH",
+                        "geoname_id": 6252001,
+                        "iso_code": "US",
                         "names": {
-                            "de": "Philippinen",
-                            "en": "Philippines",
-                            "es": "Filipinas",
-                            "fr": "Philippines",
-                            "ja": "フィリピン共和国",
-                            "pt-BR": "Filipinas",
-                            "ru": "Филиппины",
-                            "zh-CN": "菲律宾"
+                            "de": "USA",
+                            "en": "United States",
+                            "es": "Estados Unidos",
+                            "fr": "États-Unis",
+                            "ja": "アメリカ合衆国",
+                            "pt-BR": "Estados Unidos",
+                            "ru": "США",
+                            "zh-CN": "美国"
                         }
                     },
                     "location": {
-                        "accuracy_radius": 121,
-                        "latitude": 13,
-                        "longitude": 122,
-                        "time_zone": "Asia/Manila"
-                    },
-                    "postal": {
-                        "code": "34021"
+                        "accuracy_radius": 1000,
+                        "latitude": 37.751,
+                        "longitude": -97.822,
+                        "time_zone": "America/Chicago"
                     },
                     "registered_country": {
-                        "geoname_id": 1694008,
-                        "iso_code": "PH",
-                        "names": {
-                            "de": "Philippinen",
-                            "en": "Philippines",
-                            "es": "Filipinas",
-                            "fr": "Philippines",
-                            "ja": "フィリピン共和国",
-                            "pt-BR": "Filipinas",
-                            "ru": "Филиппины",
-                            "zh-CN": "菲律宾"
-                        }
-                    },
-                    "represented_country": {
                         "geoname_id": 6252001,
                         "iso_code": "US",
                         "names": {
@@ -263,13 +269,12 @@ $ mmdbinspect -db GeoIP2-Country-Test.mmdb -db GeoIP2-City-Test.mmdb 202.196.224
                             "pt-BR": "Estados Unidos",
                             "ru": "США",
                             "zh-CN": "美国"
-                        },
-                        "type": "military"
+                        }
                     }
                 }
             }
         ],
-        "Lookup": "202.196.224.4"
+        "Lookup": "152.216.7.110"
     }
 ]
 ```
@@ -279,31 +284,31 @@ $ mmdbinspect -db GeoIP2-Country-Test.mmdb -db GeoIP2-City-Test.mmdb 202.196.224
     <summary>Look up multiple IPs/networks in a single database</summary>
 
 ```bash
-$ mmdbinspect -db GeoIP2-Connection-Type-Test.mmdb 1.0.9.16/28 2003::ff00:3a4c/128
+$ mmdbinspect -db GeoIP2-Connection-Type.mmdb 152.216.7.110/20 2001:0:98d8::/64
 [
     {
-        "Database": "GeoIP2-Connection-Type-Test.mmdb",
+        "Database": "GeoIP2-Connection-Type.mmdb",
         "Records": [
             {
-                "Network": "1.0.9.16/21",
+                "Network": "152.216.0.0/13",
                 "Record": {
-                    "connection_type": "Dialup"
+                    "connection_type": "Corporate"
                 }
             }
         ],
-        "Lookup": "1.0.9.16/28"
+        "Lookup": "152.216.7.110/20"
     },
     {
-        "Database": "GeoIP2-Connection-Type-Test.mmdb",
+        "Database": "GeoIP2-Connection-Type.mmdb",
         "Records": [
             {
-                "Network": "2003::ff00:3a4c/24",
+                "Network": "2001:0:98d8::/45",
                 "Record": {
-                    "connection_type": "Cable/DSL"
+                    "connection_type": "Corporate"
                 }
             }
         ],
-        "Lookup": "2003::ff00:3a4c/128"
+        "Lookup": "2001:0:98d8::/64"
     }
 ]
 ```
@@ -313,57 +318,60 @@ $ mmdbinspect -db GeoIP2-Connection-Type-Test.mmdb 1.0.9.16/28 2003::ff00:3a4c/1
     <summary>Look up multiple IPs/networks in multiple databases</summary>
 
 ```bash
-$ mmdbinspect -db GeoIP2-Static-IP-Score-Test.mmdb -db GeoIP2-User-Count-Test.mmdb 1.2.3.5 1.2.3.66
+$ mmdbinspect -db GeoIP2-DensityIncome.mmdb -db GeoIP2-User-Count.mmdb 152.216.7.32/27 2610:30::/64
 [
     {
-        "Database": "GeoIP2-Static-IP-Score-Test.mmdb",
+        "Database": "GeoIP2-DensityIncome.mmdb",
         "Records": [
             {
-                "Network": "1.2.3.5/32",
+                "Network": "152.216.7.32/21",
                 "Record": {
-                    "score": 0.06
+                    "average_income": 26483,
+                    "population_density": 1265
                 }
             }
         ],
-        "Lookup": "1.2.3.5"
+        "Lookup": "152.216.7.32/27"
     },
     {
-        "Database": "GeoIP2-Static-IP-Score-Test.mmdb",
+        "Database": "GeoIP2-DensityIncome.mmdb",
         "Records": [
             {
-                "Network": "1.2.3.66/26",
+                "Network": "2610:30::/38",
                 "Record": {
-                    "score": 0.12
+                    "average_income": 30369,
+                    "population_density": 934
                 }
             }
         ],
-        "Lookup": "1.2.3.66"
+        "Lookup": "2610:30::/64"
     },
     {
-        "Database": "GeoIP2-User-Count-Test.mmdb",
+        "Database": "GeoIP2-User-Count.mmdb",
         "Records": [
             {
-                "Network": "1.2.3.5/32",
+                "Network": "152.216.7.32/27",
                 "Record": {
-                    "ipv4_24": 4,
-                    "ipv4_32": 1
-                }
-            }
-        ],
-        "Lookup": "1.2.3.5"
-    },
-    {
-        "Database": "GeoIP2-User-Count-Test.mmdb",
-        "Records": [
-            {
-                "Network": "1.2.3.66/26",
-                "Record": {
-                    "ipv4_24": 4,
+                    "ipv4_24": 6,
                     "ipv4_32": 0
                 }
             }
         ],
-        "Lookup": "1.2.3.66"
+        "Lookup": "152.216.7.32/27"
+    },
+    {
+        "Database": "GeoIP2-User-Count.mmdb",
+        "Records": [
+            {
+                "Network": "2610:30::/27",
+                "Record": {
+                    "ipv6_32": 0,
+                    "ipv6_48": 0,
+                    "ipv6_64": 0
+                }
+            }
+        ],
+        "Lookup": "2610:30::/64"
     }
 ]
 ```
@@ -374,35 +382,39 @@ $ mmdbinspect -db GeoIP2-Static-IP-Score-Test.mmdb -db GeoIP2-User-Count-Test.mm
 
 ```bash
 $ cat list.txt
-5.83.124.0/20
-216.160.83.0/27
-$ cat list.txt | xargs mmdbinspect -db GeoIP2-DensityIncome-Test.mmdb
+152.216.7.32/27
+2610:30::/64
+$ cat list.txt | xargs mmdbinspect -db GeoIP2-ISP.mmdb
 [
     {
-        "Database": "GeoIP2-DensityIncome-Test.mmdb",
+        "Database": "/usr/local/share/GeoIP/GeoIP2-ISP.mmdb",
         "Records": [
             {
-                "Network": "5.83.124.0/22",
+                "Network": "152.216.7.32/20",
                 "Record": {
-                    "average_income": 32323,
-                    "population_density": 1232
+                    "autonomous_system_number": 30313,
+                    "autonomous_system_organization": "IRS",
+                    "isp": "Internal Revenue Service",
+                    "organization": "Internal Revenue Service"
                 }
             }
         ],
-        "Lookup": "5.83.124.0/20"
+        "Lookup": "152.216.7.32/27"
     },
     {
-        "Database": "GeoIP2-DensityIncome-Test.mmdb",
+        "Database": "/usr/local/share/GeoIP/GeoIP2-ISP.mmdb",
         "Records": [
             {
-                "Network": "216.160.83.0/24",
+                "Network": "2610:30::/32",
                 "Record": {
-                    "average_income": 24626,
-                    "population_density": 1341
+                    "autonomous_system_number": 30313,
+                    "autonomous_system_organization": "IRS",
+                    "isp": "Internal Revenue Service",
+                    "organization": "Internal Revenue Service"
                 }
             }
         ],
-        "Lookup": "216.160.83.0/27"
+        "Lookup": "2610:30::/64"
     }
 ]
 ```
@@ -411,9 +423,48 @@ $ cat list.txt | xargs mmdbinspect -db GeoIP2-DensityIncome-Test.mmdb
 <details>
 <summary>Tame the output with the <code>jq</code> utility</summary>
 
+Print out the `isp` field from each result found:
 ```bash
-$ mmdbinspect -db GeoIP2-ISP-Test.mmdb 5.145.96.0 | jq '.[] | .Records[].Record.isp'
-"Finecom"
+$ mmdbinspect -db GeoIP2-ISP.mmdb 152.216.7.32/27 | jq -r '.[].Records[].Record.isp'
+Internal Revenue Service
+```
+
+Print out the `isp` field from each result found in a specific format using string addition:
+```bash
+$ mmdbinspect -db GeoIP2-ISP.mmdb 152.216.7.32/27 | jq -r '.[].Records[].Record | "isp=" + .isp'
+isp=Internal Revenue Service
+```
+
+Print out the `city` and `country` names from each record using string addition:
+```bash
+$ mmdbinspect -db GeoIP2-City.mmdb 2610:30::/64 | jq -r '.[].Records[].Record | .city.names.en + ", " + .country.names.en'
+Martinsburg, United States
+```
+
+Print out the `city` and `country` names from each record using array construction and `join`:
+```bash
+$ mmdbinspect -db GeoIP2-City.mmdb 2610:30::/64 | jq -r '.[].Records[].Record | [.city.names.en, .country.names.en] | join(", ")'
+Martinsburg, United States
+```
+
+Get the AS number for an IP:
+```bash
+$ mmdbinspect -db GeoLite2-ASN.mmdb 152.216.7.49 | jq -r '.[].Records[].Record.autonomous_system_number'
+30313
+```
+
+When asking `jq` to print a path it can't find, it'll print `null`:
+```bash
+$ mmdbinspect -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.[].invalid.path'
+null
+```
+
+When asking `jq` to concatenate or join a path it can't find, it'll leave it blank:
+```bash
+$ mmdbinspect -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.[].Records[].Record | .city.names.en + ", " + .country.names.en'
+, United States
+$ mmdbinspect -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.[].Records[].Record | [.city.names.en, .country.names.en] | join(", ")'
+, United States
 ```
 </details>
 
