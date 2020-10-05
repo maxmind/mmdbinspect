@@ -5,17 +5,20 @@ import (
 
 	"github.com/oschwald/maxminddb-golang"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-const CityDBPath = "../../test/data/test-data/GeoIP2-City-Test.mmdb"
-const CountryDBPath = "../../test/data/test-data/GeoIP2-Country-Test.mmdb"
+const (
+	CityDBPath    = "../../test/data/test-data/GeoIP2-City-Test.mmdb"
+	CountryDBPath = "../../test/data/test-data/GeoIP2-Country-Test.mmdb"
+)
 
 func TestOpenDB(t *testing.T) {
 	assert := assert.New(t)
 
 	assert.FileExists(CityDBPath, "database exists")
 
-	var reader, err = OpenDB(CityDBPath)
+	reader, err := OpenDB(CityDBPath)
 	assert.NoError(err, "no open error")
 	assert.IsType(maxminddb.Reader{}, *reader)
 
@@ -38,15 +41,15 @@ func TestOpenDB(t *testing.T) {
 	assert.Nil(reader)
 
 	if reader != nil {
-		reader.Close()
+		require.NoError(t, reader.Close())
 	}
 }
 
 func TestRecordsForNetwork(t *testing.T) {
 	assert := assert.New(t)
-	var reader, _ = OpenDB(CityDBPath) // ipv6 database
+	reader, _ := OpenDB(CityDBPath) // ipv6 database
 
-	var records, err = RecordsForNetwork(*reader, "81.2.69.142")
+	records, err := RecordsForNetwork(*reader, "81.2.69.142")
 	assert.NoError(err, "no error on lookup of 81.2.69.142")
 	assert.NotNil(records, "records returned")
 
@@ -63,22 +66,22 @@ func TestRecordsForNetwork(t *testing.T) {
 	assert.Nil(records, "no records returned for X.X.Y.Z")
 	assert.Equal("X.X.Y.Z is not a valid IP address", err.Error())
 
-	reader.Close()
+	require.NoError(t, reader.Close())
 }
 
 func TestRecordToString(t *testing.T) {
 	assert := assert.New(t)
 
-	var reader, _ = OpenDB(CityDBPath)
-	var records, _ = RecordsForNetwork(*reader, "81.2.69.142")
-	var prettyJSON, err = RecordToString(records)
+	reader, _ := OpenDB(CityDBPath)
+	records, _ := RecordsForNetwork(*reader, "81.2.69.142")
+	prettyJSON, err := RecordToString(records)
 
 	assert.NoError(err, "no error on stringification")
 	assert.NotNil(prettyJSON, "records stringified")
 	assert.Contains(prettyJSON, "London")
 	assert.Contains(prettyJSON, "2643743")
 
-	reader.Close()
+	require.NoError(t, reader.Close())
 }
 
 func TestAggregatedRecords(t *testing.T) {

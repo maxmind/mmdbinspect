@@ -12,11 +12,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+// RecordForNetwork holds a network and the corresponding record.
 type RecordForNetwork struct {
 	Network string
 	Record  interface{}
 }
 
+// RecordSet holds the records for a lookup in a database.
 type RecordSet struct {
 	Database string
 	Records  interface{}
@@ -44,9 +46,8 @@ func OpenDB(path string) (*maxminddb.Reader, error) {
 // RecordsForNetwork fetches mmdb records inside a given network.  If an
 // address is provided without a netmask a /32 will be inferred for v4
 // addresses and a /128 will be inferred for v6 addresses.
-
 func RecordsForNetwork(reader maxminddb.Reader, maybeNetwork string) (interface{}, error) {
-	var lookupNetwork = maybeNetwork
+	lookupNetwork := maybeNetwork
 
 	if !strings.Contains(lookupNetwork, "/") {
 		if strings.Count(maybeNetwork, ":") >= 2 {
@@ -57,7 +58,6 @@ func RecordsForNetwork(reader maxminddb.Reader, maybeNetwork string) (interface{
 	}
 
 	_, network, err := net.ParseCIDR(lookupNetwork)
-
 	if err != nil {
 		return nil, errors.Errorf("%v is not a valid IP address", maybeNetwork)
 	}
@@ -69,7 +69,6 @@ func RecordsForNetwork(reader maxminddb.Reader, maybeNetwork string) (interface{
 	for n.Next() {
 		var record interface{}
 		address, err := n.Network(&record)
-
 		if err != nil {
 			return nil, errors.WithMessagef(err, "Could not get next network")
 		}
@@ -84,7 +83,9 @@ func RecordsForNetwork(reader maxminddb.Reader, maybeNetwork string) (interface{
 	return found, nil
 }
 
-func AggregatedRecords(networks []string, databases []string) (interface{}, error) {
+// AggregatedRecords returns the aggregated records for the networks and
+// databases provided.
+func AggregatedRecords(networks, databases []string) (interface{}, error) {
 	recordSets := make([]RecordSet, 0)
 
 	for _, path := range databases {
@@ -113,7 +114,6 @@ func AggregatedRecords(networks []string, databases []string) (interface{}, erro
 // RecordToString converts an mmdb record into a JSON-formatted string
 func RecordToString(record interface{}) (string, error) {
 	json, err := json.MarshalIndent(record, "", "    ")
-
 	if err != nil {
 		return "", errors.Errorf("Could not convert record to string")
 	}
