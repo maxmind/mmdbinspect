@@ -58,13 +58,11 @@ func main() {
 	}
 
 	records, err := mmdbinspect.AggregatedRecords(network, mmdb)
-
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	json, err := mmdbinspect.RecordToString(records)
-
 	if err != nil {
 		log.Fatal(err)
 	}

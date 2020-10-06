@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSuccessfulLookup(t *testing.T) {
@@ -17,12 +18,12 @@ func TestSuccessfulLookup(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	var args = "foo.go --db ../../test/data/test-data/GeoIP2-City-Test.mmdb 81.2.69.142"
+	args := "foo.go --db ../../test/data/test-data/GeoIP2-City-Test.mmdb 81.2.69.142"
 	os.Args = strings.Split(args, " ")
 
 	main()
 
-	w.Close()
+	require.NoError(t, w.Close())
 	out, _ := ioutil.ReadAll(r)
 	os.Stdout = rescueStdout
 

@@ -1,6 +1,10 @@
 ---
 name: Build
-on: [push]
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "4 15 * * SUN"
 
 jobs:
   build:
