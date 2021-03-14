@@ -30,13 +30,7 @@ jobs:
         run: git submodule init && git submodule update
 
       - name: Get dependencies
-        run: |
-          go get -v -t -d ./...
-          if [ -f Gopkg.toml ]; then
-            curl
-            https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-          fi
+        run: go get -v -t -d ./...
 
       - name: Build
         run: go build -v ./...
