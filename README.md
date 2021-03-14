@@ -49,7 +49,9 @@ This software is in beta. No guarantees are made, including relating to interfac
 
 ### Installing via binary release
 
-[Release binaries](https://github.com/maxmind/mmdbinspect/releases) have been made available for several popular platorms. Simply download the binary for your platform and run it.
+[Release binaries](https://github.com/maxmind/mmdbinspect/releases) have
+been made available for several popular platforms. Simply download the
+binary for your platform and run it.
 
 ### Installing on Linux via the tarball
 
