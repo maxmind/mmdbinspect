@@ -49,7 +49,9 @@ This software is in beta. No guarantees are made, including relating to interfac
 
 ### Installing via binary release
 
-[Release binaries](https://github.com/maxmind/mmdbinspect/releases) have been made available for several popular platorms. Simply download the binary for your platform and run it.
+[Release binaries](https://github.com/maxmind/mmdbinspect/releases) have
+been made available for several popular platforms. Simply download the
+binary for your platform and run it.
 
 ### Installing on Linux via the tarball
 
@@ -474,6 +476,6 @@ Please report bugs by filing an issue with our GitHub issue tracker at [https://
 
 ## Copyright and License
 
-This software is Copyright (c) 2019 - 2020 by MaxMind, Inc.
+This software is Copyright (c) 2019 - 2021 by MaxMind, Inc.
 
 This is free software, licensed under the [Apache License, Version 2.0](LICENSE-APACHE) or the [MIT License](LICENSE-MIT), at your option.
