@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -27,5 +26,5 @@ func TestSuccessfulLookup(t *testing.T) {
 	out, _ := ioutil.ReadAll(r)
 	os.Stdout = rescueStdout
 
-	assert.Contains(fmt.Sprintf("%s", out), "London")
+	assert.Contains(string(out), "London")
 }
