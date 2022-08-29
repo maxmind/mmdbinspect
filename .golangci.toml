@@ -239,7 +239,7 @@
 
 [linters-settings.gofumpt]
     extra-rules = true
-    lang-version = "1.17"
+    lang-version = "1.18"
 
 [linters-settings.gomodguard]
   [[linters-settings.gomodguard.blocked.modules]]
