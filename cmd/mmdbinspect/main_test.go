@@ -11,10 +11,11 @@ import (
 )
 
 func TestSuccessfulLookup(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
 	rescueStdout := os.Stdout
-	r, w, _ := os.Pipe()
+	r, w, err := os.Pipe()
+	require.NoError(t, err)
 	os.Stdout = w
 
 	args := "foo.go --db ../../test/data/test-data/GeoIP2-City-Test.mmdb 81.2.69.142"
@@ -26,5 +27,5 @@ func TestSuccessfulLookup(t *testing.T) {
 	out, _ := ioutil.ReadAll(r)
 	os.Stdout = rescueStdout
 
-	assert.Contains(string(out), "London")
+	a.Contains(string(out), "London")
 }

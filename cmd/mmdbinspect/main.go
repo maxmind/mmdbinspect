@@ -1,3 +1,5 @@
+// mmdbinspect looks up records for one or more IPs/networks in one or more
+// .mmdb databases
 package main
 
 import (
