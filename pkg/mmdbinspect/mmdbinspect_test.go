@@ -14,31 +14,31 @@ const (
 )
 
 func TestOpenDB(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
-	assert.FileExists(CityDBPath, "database exists")
+	a.FileExists(CityDBPath, "database exists")
 
 	reader, err := OpenDB(CityDBPath)
-	assert.NoError(err, "no open error")
-	assert.IsType(maxminddb.Reader{}, *reader)
+	a.NoError(err, "no open error")
+	a.IsType(maxminddb.Reader{}, *reader)
 
 	reader, err = OpenDB("foo/bar/baz")
-	assert.Error(err, "open error when file does not exist")
-	assert.Nil(reader)
-	assert.Equal(
+	a.Error(err, "open error when file does not exist")
+	a.Nil(reader)
+	a.Equal(
 		"foo/bar/baz does not exist",
 		err.Error(),
 	)
 
 	reader, err = OpenDB("../../test/data/test-data/README.md")
-	assert.Error(err)
-	assert.Contains(err.Error(), "README.md could not be opened: error opening database: invalid MaxMind DB file")
-	assert.Nil(reader)
+	a.Error(err)
+	a.Contains(err.Error(), "README.md could not be opened: error opening database: invalid MaxMind DB file")
+	a.Nil(reader)
 
 	reader, err = OpenDB("../../test/data/test-data/GeoIP2-City-Test-Invalid-Node-Count.mmdb")
-	assert.Error(err)
-	assert.Contains(err.Error(), "invalid metadata")
-	assert.Nil(reader)
+	a.Error(err)
+	a.Contains(err.Error(), "invalid metadata")
+	a.Nil(reader)
 
 	if reader != nil {
 		require.NoError(t, reader.Close())
@@ -46,51 +46,54 @@ func TestOpenDB(t *testing.T) {
 }
 
 func TestRecordsForNetwork(t *testing.T) {
-	assert := assert.New(t)
-	reader, _ := OpenDB(CityDBPath) // ipv6 database
+	a := assert.New(t)
+	reader, err := OpenDB(CityDBPath) // ipv6 database
+	a.NoError(err, "no open error")
 
 	records, err := RecordsForNetwork(*reader, "81.2.69.142")
-	assert.NoError(err, "no error on lookup of 81.2.69.142")
-	assert.NotNil(records, "records returned")
+	a.NoError(err, "no error on lookup of 81.2.69.142")
+	a.NotNil(records, "records returned")
 
 	records, err = RecordsForNetwork(*reader, "81.2.69.0/24")
-	assert.NoError(err, "no error on lookup of 81.2.69.0/24")
-	assert.NotNil(records, "records returned")
+	a.NoError(err, "no error on lookup of 81.2.69.0/24")
+	a.NotNil(records, "records returned")
 
 	records, err = RecordsForNetwork(*reader, "10.255.255.255/29")
-	assert.NoError(err, "got no error when IP not found")
-	assert.Nil(records, "no records returned for 10.255.255.255/29")
+	a.NoError(err, "got no error when IP not found")
+	a.Nil(records, "no records returned for 10.255.255.255/29")
 
 	records, err = RecordsForNetwork(*reader, "X.X.Y.Z")
-	assert.Error(err, "got an error")
-	assert.Nil(records, "no records returned for X.X.Y.Z")
-	assert.Equal("X.X.Y.Z is not a valid IP address", err.Error())
+	a.Error(err, "got an error")
+	a.Nil(records, "no records returned for X.X.Y.Z")
+	a.Equal("X.X.Y.Z is not a valid IP address", err.Error())
 
 	require.NoError(t, reader.Close())
 }
 
 func TestRecordToString(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
-	reader, _ := OpenDB(CityDBPath)
-	records, _ := RecordsForNetwork(*reader, "81.2.69.142")
+	reader, err := OpenDB(CityDBPath)
+	a.NoError(err, "no open error")
+	records, err := RecordsForNetwork(*reader, "81.2.69.142")
+	a.NoError(err, "no RecordsForNetwork error")
 	prettyJSON, err := RecordToString(records)
 
-	assert.NoError(err, "no error on stringification")
-	assert.NotNil(prettyJSON, "records stringified")
-	assert.Contains(prettyJSON, "London")
-	assert.Contains(prettyJSON, "2643743")
+	a.NoError(err, "no error on stringification")
+	a.NotNil(prettyJSON, "records stringified")
+	a.Contains(prettyJSON, "London")
+	a.Contains(prettyJSON, "2643743")
 
 	require.NoError(t, reader.Close())
 }
 
 func TestAggregatedRecords(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
 	dbs := []string{CityDBPath, CountryDBPath}
 	networks := []string{"81.2.69.142", "8.8.8.8"}
 	results, err := AggregatedRecords(networks, dbs)
 
-	assert.NoError(err)
-	assert.NotNil(results)
+	a.NoError(err)
+	a.NotNil(results)
 }

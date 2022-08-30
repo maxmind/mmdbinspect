@@ -3,7 +3,6 @@ package mmdbinspect
 
 import (
 	"encoding/json"
-	"fmt"
 	"net"
 	"os"
 	"strings"
@@ -25,7 +24,7 @@ type RecordSet struct {
 	Lookup   string
 }
 
-// OpenDB returns a maxminddb.Reader
+// OpenDB returns a maxminddb.Reader.
 func OpenDB(path string) (*maxminddb.Reader, error) {
 	_, err := os.Stat(path)
 
@@ -93,30 +92,31 @@ func AggregatedRecords(networks, databases []string) (interface{}, error) {
 		if err != nil {
 			return nil, errors.WithMessagef(err, "could not open database %v", path)
 		}
-		defer reader.Close()
 
 		for _, thisNetwork := range networks {
 			var records interface{}
 			records, err = RecordsForNetwork(*reader, thisNetwork)
 
 			if err != nil {
+				_ = reader.Close()
 				return nil, errors.WithMessagef(err, "could not get records from db %v", path)
 			}
 
 			set := RecordSet{path, records, thisNetwork}
 			recordSets = append(recordSets, set)
 		}
+		_ = reader.Close()
 	}
 
 	return recordSets, nil
 }
 
-// RecordToString converts an mmdb record into a JSON-formatted string
+// RecordToString converts an mmdb record into a JSON-formatted string.
 func RecordToString(record interface{}) (string, error) {
-	json, err := json.MarshalIndent(record, "", "    ")
+	j, err := json.MarshalIndent(record, "", "    ")
 	if err != nil {
 		return "", errors.Errorf("Could not convert record to string")
 	}
 
-	return fmt.Sprintf("%v", string(json)), nil
+	return string(j), nil
 }
