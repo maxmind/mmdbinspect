@@ -1,7 +1,7 @@
 package main
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 	"testing"
@@ -24,7 +24,8 @@ func TestSuccessfulLookup(t *testing.T) {
 	main()
 
 	require.NoError(t, w.Close())
-	out, _ := ioutil.ReadAll(r)
+	out, err := io.ReadAll(r)
+	require.NoError(t, err)
 	os.Stdout = rescueStdout
 
 	a.Contains(string(out), "London")
