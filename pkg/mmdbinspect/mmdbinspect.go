@@ -3,12 +3,13 @@ package mmdbinspect
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net"
 	"os"
 	"strings"
 
 	"github.com/oschwald/maxminddb-golang"
-	"github.com/pkg/errors"
 )
 
 // RecordForNetwork holds a network and the corresponding record.
@@ -29,14 +30,14 @@ func OpenDB(path string) (*maxminddb.Reader, error) {
 	_, err := os.Stat(path)
 
 	if os.IsNotExist(err) {
-		return nil, errors.Errorf("%v does not exist", path)
+		return nil, fmt.Errorf("%v does not exist", path)
 	} else if err != nil {
 		return nil, err
 	}
 
 	db, err := maxminddb.Open(path)
 	if err != nil {
-		return nil, errors.WithMessagef(err, "%v could not be opened", path)
+		return nil, fmt.Errorf("%v could not be opened: %w", path, err)
 	}
 
 	return db, nil
@@ -58,7 +59,7 @@ func RecordsForNetwork(reader maxminddb.Reader, maybeNetwork string) (interface{
 
 	_, network, err := net.ParseCIDR(lookupNetwork)
 	if err != nil {
-		return nil, errors.Errorf("%v is not a valid IP address", maybeNetwork)
+		return nil, fmt.Errorf("%v is not a valid IP address", maybeNetwork)
 	}
 
 	n := reader.NetworksWithin(network)
@@ -69,7 +70,7 @@ func RecordsForNetwork(reader maxminddb.Reader, maybeNetwork string) (interface{
 		var record interface{}
 		address, err := n.Network(&record)
 		if err != nil {
-			return nil, errors.WithMessagef(err, "Could not get next network")
+			return nil, fmt.Errorf("could not get next network: %w", err)
 		}
 
 		found = append(found, RecordForNetwork{address.String(), record})
@@ -90,7 +91,7 @@ func AggregatedRecords(networks, databases []string) (interface{}, error) {
 	for _, path := range databases {
 		reader, err := OpenDB(path)
 		if err != nil {
-			return nil, errors.WithMessagef(err, "could not open database %v", path)
+			return nil, fmt.Errorf("could not open database %v: %w", path, err)
 		}
 
 		for _, thisNetwork := range networks {
@@ -99,7 +100,7 @@ func AggregatedRecords(networks, databases []string) (interface{}, error) {
 
 			if err != nil {
 				_ = reader.Close()
-				return nil, errors.WithMessagef(err, "could not get records from db %v", path)
+				return nil, fmt.Errorf("could not get records from db %v: %w", path, err)
 			}
 
 			set := RecordSet{path, records, thisNetwork}
@@ -115,7 +116,7 @@ func AggregatedRecords(networks, databases []string) (interface{}, error) {
 func RecordToString(record interface{}) (string, error) {
 	j, err := json.MarshalIndent(record, "", "    ")
 	if err != nil {
-		return "", errors.Errorf("Could not convert record to string")
+		return "", errors.New("could not convert record to string")
 	}
 
 	return string(j), nil
