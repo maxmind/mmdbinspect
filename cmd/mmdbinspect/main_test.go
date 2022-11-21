@@ -18,7 +18,7 @@ func TestSuccessfulLookup(t *testing.T) {
 	require.NoError(t, err)
 	os.Stdout = w
 
-	args := "foo.go --db ../../test/data/test-data/GeoIP2-City-Test.mmdb 81.2.69.142"
+	args := "foo.go -db ../../test/data/test-data/GeoIP2-City-Test.mmdb 81.2.69.142"
 	os.Args = strings.Split(args, " ")
 
 	main()
