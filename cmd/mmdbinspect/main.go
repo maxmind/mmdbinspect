@@ -25,7 +25,7 @@ func (i *arrayFlags) Set(value string) error {
 
 func usage() {
 	fmt.Printf(
-		"Usage: %s --db path/to/db --db path/to/other/db 130.113.64.30/24 0:0:0:0:0:ffff:8064:a678\n",
+		"Usage: %s -db path/to/db -db path/to/other/db 130.113.64.30/24 0:0:0:0:0:ffff:8064:a678\n",
 		os.Args[0],
 	)
 	flag.PrintDefaults()
