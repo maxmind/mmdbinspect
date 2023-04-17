@@ -60,3 +60,6 @@ nfpms:
       'LICENSE-APACHE': '/usr/share/doc/mmdbinspect/LICENSE-APACHE'
       'LICENSE-MIT': '/usr/share/doc/mmdbinspect/LICENSE-MIT'
       'README.md': '/usr/share/doc/mmdbinspect/README.md'
+
+release:
+  target_commitish: "{{ .FullCommit }}"
