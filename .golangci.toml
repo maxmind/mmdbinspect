@@ -1,28 +1,34 @@
 [run]
   deadline = "10m"
-
   tests = true
 
 [linters]
   disable-all = true
   enable = [
+    "asasalint",
     "asciicheck",
     "bidichk",
     "bodyclose",
     "containedctx",
     "contextcheck",
     "depguard",
+    # This is probably worthwhile, but there are a number of false positives
+    # that would need to be addressed.
+    # "dupword",
     "durationcheck",
     "errcheck",
     "errchkjson",
     "errname",
     "errorlint",
-    # Causes a panic.
+    # This doesn't seem to know about CTEs or DELETEs with RETURNING
     # "execinquery",
     "exhaustive",
+    # We often don't initialize all of the struct fields. This is fine
+    # generally
+    # "exhaustruct",
     "exportloopref",
     "forbidigo",
-    # We tried this liner but most places we do forced type asserts are
+    # We tried this linter but most places we do forced type asserts are
     # pretty safe, e.g., an atomic.Value when everything is encapsulated
     # in a small package.
     # "forcetypeassert",
@@ -34,18 +40,29 @@
     "gomodguard",
     "gosec",
     "gosimple",
+    # This only "caught" one thing, and it seemed like a reasonable use
+    # of Han script. Generally, I don't think we want to prevent the use
+    # of particulr scripts. The time.Local checks might be useful, but
+    # this didn't actually catch anything of note there.
+    # "gosmopolitan",
     "govet",
     "grouper",
     "ineffassign",
     "lll",
+    # We don't use these loggers
+    # "loggercheck",
     "makezero",
     # Maintainability Index. Seems like it could be a good idea, but a
     # lot of things fail and we would need to make some decisions about
     # what to allow.
     # "maintidx",
     "misspell",
+    # Causes panics, e.g., when processing mmerrors
+    # "musttag",
     "nakedret",
     "nilerr",
+    # Perhaps too opinionated. We do have some legitimate uses of "return nil, nil"
+    # "nilnil",
     "noctx",
     "nolintlint",
     # We occasionally use named returns for documentation, which is helpful.
@@ -56,34 +73,42 @@
     "nosprintfhostport",
     "predeclared",
     "revive",
+    "rowserrcheck",
+    # https://github.com/golangci/golangci-lint/issues/287
+    # "safesql",
+    "sqlclosecheck",
     "staticcheck",
     "stylecheck",
+    # We have very few structs with multiple tags and for the couple we had, this
+    # actually made it harder to read.
+    # "tagalign",
     "tenv",
     "tparallel",
     "typecheck",
     "unconvert",
     "unparam",
     "unused",
+    "usestdlibvars",
     "vetshadow",
-    # Doesn't support 1.18
-    # "wastedassign",
+    "wastedassign",
     # We don't currently wrap external errors in this module.
     # "wrapcheck",
   ]
 
 # Please note that we only use depguard for stdlib as gomodguard only
 # supports modules currently. See https://github.com/ryancurrah/gomodguard/issues/12
-[linters-settings.depguard]
-  list-type = "blacklist"
-  include-go-root = true
-  packages = [
-    # ioutil is deprecated. The functions have been moved elsewhere:
-    # https://golang.org/doc/go1.16#ioutil
-    "io/ioutil",
-  ]
+[[linters-settings.depguard.rules.main.deny]]
+pkg = "io/ioutil"
+desc = "Deprecated. Functions have been moved elsewhere."
+
+[[linters-settings.depguard.rules.main.deny]]
+# golang.org/x/exp/slices has better alternatives. The proposal to add this
+# to Go has been accepted, https://github.com/golang/go/issues/57433
+pkg = "sort"
+desc = "Use golang.org/x/exp/slices instead"
 
 [linters-settings.errcheck]
-    # Don't allow setting of error to the blank identifier. If there is a legtimate
+    # Don't allow setting of error to the blank identifier. If there is a legitimate
     # reason, there should be a nolint with an explanation.
     check-blank = true
 
@@ -116,8 +141,20 @@
 [linters-settings.forbidigo]
     # Forbid the following identifiers
     forbid = [
-        "^minFraud*",
-        "^maxMind*",
+        "Geoip", # use "GeoIP"
+        "^geoIP", # use "geoip"
+        "^hubSpot", # use "hubspot"
+        "Maxmind", # use "MaxMind"
+        "^maxMind", # use "maxmind"
+        "Minfraud", # use "MinFraud"
+        "^minFraud", # use "minfraud"
+        "[Uu]ser[iI][dD]", # use "accountID" or "AccountID"
+
+        # use netip.ParsePrefix unless you really need a *net.IPNet
+        "^net.ParseCIDR",
+
+        # use netip.ParseAddr unless you really need a net.IP
+        "^net.ParseIP",
     ]
 
 [linters-settings.gocritic]
@@ -167,6 +204,11 @@
         "flagDeref",
         "flagName",
         "hexLiteral",
+        # This seems like it could be good, but we would need to update current
+        # uses. It supports "--fix", but the fixing is a bit broken.
+        # "httpNoBody",
+        # This might be good, but we would have to revist a lot of code.
+        # "hugeParam",
         "ifElseChain",
         "importShadow",
         "indexAlloc",
@@ -193,6 +235,7 @@
         # This might be good, but I don't think we want to encourage
         # significant changes to regexes as we port stuff from Perl.
         # "regexpSimplify",
+        "returnAfterHttpError",
         "ruleguard",
         "singleCaseSwitch",
         "sliceClear",
@@ -200,12 +243,14 @@
         # This seems like it might also be good, but a lot of existing code
         # fails.
         # "sloppyReassign",
-        "returnAfterHttpError",
+        # This complains about helper functions in tests.
+        # "sloppyTestFuncName",
         "sloppyTypeAssert",
         "sortSlice",
         "sprintfQuotedString",
         "sqlQuery",
         "stringsCompare",
+        "stringConcatSimplify",
         "stringXbytes",
         "switchTrue",
         "syncMapLoadAndDelete",
@@ -228,12 +273,10 @@
         "unslice",
         "valSwap",
         "weakCond",
+        # Covered by nolintlint
+        # "whyNoLint"
         "wrapperFunc",
         "yodaStyleExpr",
-        # This requires explanations for "nolint" directives. This would be
-        # nice for gosec ones, but I am not sure we want it generally unless
-        # we can get the false positive rate lower.
-        # "whyNoLint"
     ]
 
 [linters-settings.gofumpt]
@@ -254,6 +297,11 @@
   [[linters-settings.gomodguard.blocked.modules]]
   [linters-settings.gomodguard.blocked.modules."github.com/gofrs/uuid"]
     recommendations = ["github.com/google/uuid"]
+
+  [[linters-settings.gomodguard.blocked.modules]]
+  [linters-settings.gomodguard.blocked.modules."github.com/pelletier/go-toml"]
+    recommendations = ["github.com/pelletier/go-toml/v2"]
+    reason = "This is an outdated version."
 
   [[linters-settings.gomodguard.blocked.modules]]
   [linters-settings.gomodguard.blocked.modules."github.com/satori/go.uuid"]
@@ -295,9 +343,26 @@
   [linters-settings.gomodguard.blocked.modules."io/ioutil"]
 
   [[linters-settings.gomodguard.blocked.versions]]
+  [linters-settings.gomodguard.blocked.versions."github.com/jackc/pgconn"]
+    reason = "Use github.com/jackc/pgx/v5"
+
+  [[linters-settings.gomodguard.blocked.versions]]
+  [linters-settings.gomodguard.blocked.versions."github.com/jackc/pgtype"]
+    reason = "Use github.com/jackc/pgx/v5"
+
+  [[linters-settings.gomodguard.blocked.versions]]
   [linters-settings.gomodguard.blocked.versions."github.com/jackc/pgx"]
-    version = "< 4.0.0"
-    reason = "Use github.com/jackc/pgx/v4"
+    version = "< 5.0.0"
+    reason = "Use github.com/jackc/pgx/v5"
+
+  [[linters-settings.gomodguard.blocked.versions]]
+  [linters-settings.gomodguard.blocked.versions."github.com/stretchr/testify/assert"]
+    reason = "Use github.com/stretchr/testify/assert"
+
+  [[linters-settings.gomodguard.blocked.modules]]
+  [linters-settings.gomodguard.blocked.modules."inet.af/netaddr"]
+    recommendations = ["go4.org/netipx"]
+    reason = "inet.af/netaddr has been deprecated."
 
 [linters-settings.gosec]
     excludes = [
@@ -306,11 +371,24 @@
 
         # G306 - "Expect WriteFile permissions to be 0600 or less".
         "G306",
+
+        # Prohibits defer (*os.File).Close, which we allow when reading from file.
+        "G307",
     ]
 
 
 [linters-settings.govet]
+    # This seems to be duplicate setting, but enable it for good measure.
+    check-shadowing = true
     "enable-all" = true
+
+    #  Although it is very useful in particular cases where we are trying to
+    # use as little memory as possible, there are even more cases where
+    # other organizations may make more sense.
+    disable = ["fieldalignment"]
+
+    [linters-settings.govet.settings.shadow]
+        strict = true
 
 [linters-settings.lll]
     line-length = 120
@@ -353,6 +431,10 @@
     # [[linters-settings.revive.rules]]
     # name = "cognitive-complexity"
 
+    [[linters-settings.revive.rules]]
+    name = "comment-spacings"
+    arguments = ["easyjson", "nolint"]
+
     # Probably a good rule, but we have a lot of names that
     # only have case differences.
     # [[linters-settings.revive.rules]]
@@ -374,6 +456,9 @@
     # name = "cyclomatic"
 
     [[linters-settings.revive.rules]]
+    name = "datarace"
+
+    [[linters-settings.revive.rules]]
     name = "deep-exit"
 
     [[linters-settings.revive.rules]]
@@ -391,9 +476,8 @@
     [[linters-settings.revive.rules]]
     name = "empty-block"
 
-    # Disabled due to https://github.com/mgechev/revive/issues/739
-    # [[linters-settings.revive.rules]]
-    # name = "empty-lines"
+    [[linters-settings.revive.rules]]
+    name = "empty-lines"
 
     [[linters-settings.revive.rules]]
     name = "errorf"
@@ -489,6 +573,9 @@
     name = "superfluous-else"
 
     [[linters-settings.revive.rules]]
+    name = "time-equal"
+
+    [[linters-settings.revive.rules]]
     name = "time-naming"
 
     [[linters-settings.revive.rules]]
@@ -519,9 +606,8 @@
     # [[linters-settings.revive.rules]]
     # name = "unused-receiver"
 
-    # This probably makes sense after we upgrade to 1.18
-    # [[linters-settings.revive.rules]]
-    # name = "use-any"
+    [[linters-settings.revive.rules]]
+    name = "use-any"
 
     [[linters-settings.revive.rules]]
     name = "useless-break"
@@ -538,21 +624,28 @@
 [linters-settings.unparam]
     check-exported = true
 
-[linters-settings.wrapcheck]
-    "ignoreSigs" = [
-        ".Errorf(",
-        "errgroup.NewMultiError(",
-        "mmerrors.New(",
-        ".Wait(",
-        ".WithStack(",
-        ".Wrap(",
-        ".Wrapf(",
-        "v4.Retry(",
-        "v4.RetryNotify(",
-    ]
-
 [issues]
 exclude-use-default = false
+
+  # This goes off for MD5 usage, which we use heavily
+  [[issues.exclude-rules]]
+  text = "weak cryptographic primitive"
+  linters = ["gosec"]
+
+  [[issues.exclude-rules]]
+  linters = [
+    "bodyclose"
+  ]
+  # This rule doesn't really make sense for tests where we don't have an open
+  # connection and we might be passing around the response for other reasons.
+  path = "_test.go"
+
+  [[issues.exclude-rules]]
+  linters = [
+    "forbidigo"
+  ]
+  # This refers to a minFraud field, not the MaxMind Account ID
+  text = "AccountUserID|Account\\.UserID"
 
   [[issues.exclude-rules]]
   linters = [
@@ -567,28 +660,16 @@ exclude-use-default = false
   linters = [
     "gocritic"
   ]
-  ## The nolintlint linter behaves oddly with ruleguard rules
+  # The nolintlint linter behaves oddly with ruleguard rules
   source = "// *no-ruleguard"
 
   [[issues.exclude-rules]]
   linters = [
     "govet"
   ]
-  # we want to enable almost all govet rules. It is easier to just filter out
-  # the ones we don't want:
-  #
-  # * fieldalignment - way too noisy. Although it is very useful in particular
-  #   cases where we are trying to use as little memory as possible, having
-  #   it go off on every struct isn't helpful.
-  # * shadow - although often useful, it complains about _many_ err
-  #   shadowing assignments and some others where shadowing is clear.
-  text = "^(fieldalignment|shadow)"
-
-  [[issues.exclude-rules]]
-  linters = [
-    "govet"
-  ]
-  text = "shadow: declaration of \"err\" shadows declaration"
+  # These are usually fine to shadow and not allowing shadowing for them can
+  # make the code unnecessarily verbose.
+  text = 'shadow: declaration of "(ctx|err|ok)" shadows declaration'
 
   [[issues.exclude-rules]]
   linters = [
@@ -597,6 +678,27 @@ exclude-use-default = false
     "wrapcheck",
   ]
   path = "_test.go"
+
+  [[issues.exclude-rules]]
+  linters = [
+    "stylecheck",
+  ]
+  # ST1016 - methods on the same type should have the same receiver name.
+  #    easyjson doesn't interact well with this.
+  text = "ST1016"
+
+  [[issues.exclude-rules]]
+  linters = [
+    "staticcheck",
+  ]
+  # SA5008: unknown JSON option "intern" - easyjson specific option.
+  text = 'SA5008: unknown JSON option "intern"'
+
+  [[issues.exclude-rules]]
+  linters = [
+    "wrapcheck",
+  ]
+  path = "_easyjson.go"
 
   [[issues.exclude-rules]]
   linters = [
