@@ -15,13 +15,13 @@ import (
 // RecordForNetwork holds a network and the corresponding record.
 type RecordForNetwork struct {
 	Network string
-	Record  interface{}
+	Record  any
 }
 
 // RecordSet holds the records for a lookup in a database.
 type RecordSet struct {
 	Database string
-	Records  interface{}
+	Records  any
 	Lookup   string
 }
 
@@ -46,7 +46,7 @@ func OpenDB(path string) (*maxminddb.Reader, error) {
 // RecordsForNetwork fetches mmdb records inside a given network.  If an
 // address is provided without a netmask a /32 will be inferred for v4
 // addresses and a /128 will be inferred for v6 addresses.
-func RecordsForNetwork(reader maxminddb.Reader, maybeNetwork string) (interface{}, error) {
+func RecordsForNetwork(reader maxminddb.Reader, maybeNetwork string) (any, error) {
 	lookupNetwork := maybeNetwork
 
 	if !strings.Contains(lookupNetwork, "/") {
@@ -57,6 +57,7 @@ func RecordsForNetwork(reader maxminddb.Reader, maybeNetwork string) (interface{
 		}
 	}
 
+	//nolint:forbidigo // preexisting
 	_, network, err := net.ParseCIDR(lookupNetwork)
 	if err != nil {
 		return nil, fmt.Errorf("%v is not a valid IP address", maybeNetwork)
@@ -64,10 +65,10 @@ func RecordsForNetwork(reader maxminddb.Reader, maybeNetwork string) (interface{
 
 	n := reader.NetworksWithin(network)
 
-	var found []interface{}
+	var found []any
 
 	for n.Next() {
-		var record interface{}
+		var record any
 		address, err := n.Network(&record)
 		if err != nil {
 			return nil, fmt.Errorf("could not get next network: %w", err)
@@ -85,7 +86,7 @@ func RecordsForNetwork(reader maxminddb.Reader, maybeNetwork string) (interface{
 
 // AggregatedRecords returns the aggregated records for the networks and
 // databases provided.
-func AggregatedRecords(networks, databases []string) (interface{}, error) {
+func AggregatedRecords(networks, databases []string) (any, error) {
 	recordSets := make([]RecordSet, 0)
 
 	for _, path := range databases {
@@ -95,7 +96,7 @@ func AggregatedRecords(networks, databases []string) (interface{}, error) {
 		}
 
 		for _, thisNetwork := range networks {
-			var records interface{}
+			var records any
 			records, err = RecordsForNetwork(*reader, thisNetwork)
 
 			if err != nil {
@@ -113,7 +114,7 @@ func AggregatedRecords(networks, databases []string) (interface{}, error) {
 }
 
 // RecordToString converts an mmdb record into a JSON-formatted string.
-func RecordToString(record interface{}) (string, error) {
+func RecordToString(record any) (string, error) {
 	j, err := json.MarshalIndent(record, "", "    ")
 	if err != nil {
 		return "", errors.New("could not convert record to string")
