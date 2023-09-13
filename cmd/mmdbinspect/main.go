@@ -25,7 +25,7 @@ func (i *arrayFlags) Set(value string) error {
 
 func usage() {
 	fmt.Printf(
-		"Usage: %s [-skip-aliased-networks=true] -db path/to/db -db path/to/other/db 130.113.64.30/24 0:0:0:0:0:ffff:8064:a678\n", //nolint: lll
+		"Usage: %s [-include-aliased-networks] -db path/to/db -db path/to/other/db 130.113.64.30/24 0:0:0:0:0:ffff:8064:a678\n", //nolint: lll
 		os.Args[0],
 	)
 	flag.PrintDefaults()
@@ -40,9 +40,9 @@ func main() {
 	var mmdb arrayFlags
 
 	flag.Var(&mmdb, "db", "Path to an mmdb file. You may pass this arg more than once.")
-	skipAliasedNetworks := flag.Bool(
-		"skip-aliased-networks", true,
-		"Skip aliased networks (e.g. 6to4, Teredo). Ensures that IPv4 networks are only listed once.",
+	includeAliasedNetworks := flag.Bool(
+		"include-aliased-networks", false,
+		"Include aliased networks (e.g. 6to4, Teredo). This option may cause IPv4 networks to be listed more than once via aliases.", //nolint: lll
 	)
 
 	flag.Usage = usage
@@ -63,7 +63,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	records, err := mmdbinspect.AggregatedRecords(network, mmdb, *skipAliasedNetworks)
+	records, err := mmdbinspect.AggregatedRecords(network, mmdb, *includeAliasedNetworks)
 	if err != nil {
 		log.Fatal(err)
 	}
