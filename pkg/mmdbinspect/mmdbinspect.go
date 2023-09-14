@@ -46,7 +46,7 @@ func OpenDB(path string) (*maxminddb.Reader, error) {
 // RecordsForNetwork fetches mmdb records inside a given network.  If an
 // address is provided without a netmask a /32 will be inferred for v4
 // addresses and a /128 will be inferred for v6 addresses.
-func RecordsForNetwork(reader maxminddb.Reader, maybeNetwork string) (any, error) {
+func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, maybeNetwork string) (any, error) {
 	lookupNetwork := maybeNetwork
 
 	if !strings.Contains(lookupNetwork, "/") {
@@ -63,7 +63,12 @@ func RecordsForNetwork(reader maxminddb.Reader, maybeNetwork string) (any, error
 		return nil, fmt.Errorf("%v is not a valid IP address", maybeNetwork)
 	}
 
-	n := reader.NetworksWithin(network)
+	var n *maxminddb.Networks
+	if includeAliasedNetworks {
+		n = reader.NetworksWithin(network)
+	} else {
+		n = reader.NetworksWithin(network, maxminddb.SkipAliasedNetworks)
+	}
 
 	var found []any
 
@@ -86,7 +91,7 @@ func RecordsForNetwork(reader maxminddb.Reader, maybeNetwork string) (any, error
 
 // AggregatedRecords returns the aggregated records for the networks and
 // databases provided.
-func AggregatedRecords(networks, databases []string) (any, error) {
+func AggregatedRecords(networks, databases []string, includeAliasedNetworks bool) (any, error) {
 	recordSets := make([]RecordSet, 0)
 
 	for _, path := range databases {
@@ -97,7 +102,7 @@ func AggregatedRecords(networks, databases []string) (any, error) {
 
 		for _, thisNetwork := range networks {
 			var records any
-			records, err = RecordsForNetwork(*reader, thisNetwork)
+			records, err = RecordsForNetwork(*reader, includeAliasedNetworks, thisNetwork)
 
 			if err != nil {
 				_ = reader.Close()

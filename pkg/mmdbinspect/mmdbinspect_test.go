@@ -50,19 +50,19 @@ func TestRecordsForNetwork(t *testing.T) {
 	reader, err := OpenDB(CityDBPath) // ipv6 database
 	a.NoError(err, "no open error")
 
-	records, err := RecordsForNetwork(*reader, "81.2.69.142")
+	records, err := RecordsForNetwork(*reader, false, "81.2.69.142")
 	a.NoError(err, "no error on lookup of 81.2.69.142")
 	a.NotNil(records, "records returned")
 
-	records, err = RecordsForNetwork(*reader, "81.2.69.0/24")
+	records, err = RecordsForNetwork(*reader, false, "81.2.69.0/24")
 	a.NoError(err, "no error on lookup of 81.2.69.0/24")
 	a.NotNil(records, "records returned")
 
-	records, err = RecordsForNetwork(*reader, "10.255.255.255/29")
+	records, err = RecordsForNetwork(*reader, false, "10.255.255.255/29")
 	a.NoError(err, "got no error when IP not found")
 	a.Nil(records, "no records returned for 10.255.255.255/29")
 
-	records, err = RecordsForNetwork(*reader, "X.X.Y.Z")
+	records, err = RecordsForNetwork(*reader, false, "X.X.Y.Z")
 	a.Error(err, "got an error")
 	a.Nil(records, "no records returned for X.X.Y.Z")
 	a.Equal("X.X.Y.Z is not a valid IP address", err.Error())
@@ -75,7 +75,7 @@ func TestRecordToString(t *testing.T) {
 
 	reader, err := OpenDB(CityDBPath)
 	a.NoError(err, "no open error")
-	records, err := RecordsForNetwork(*reader, "81.2.69.142")
+	records, err := RecordsForNetwork(*reader, false, "81.2.69.142")
 	a.NoError(err, "no RecordsForNetwork error")
 	prettyJSON, err := RecordToString(records)
 
@@ -92,7 +92,7 @@ func TestAggregatedRecords(t *testing.T) {
 
 	dbs := []string{CityDBPath, CountryDBPath}
 	networks := []string{"81.2.69.142", "8.8.8.8"}
-	results, err := AggregatedRecords(networks, dbs)
+	results, err := AggregatedRecords(networks, dbs, false)
 
 	a.NoError(err)
 	a.NotNil(results)
