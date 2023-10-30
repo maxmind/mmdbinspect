@@ -11,6 +11,7 @@ import (
 const (
 	CityDBPath    = "../../test/data/test-data/GeoIP2-City-Test.mmdb"
 	CountryDBPath = "../../test/data/test-data/GeoIP2-Country-Test.mmdb"
+	ISPDBPath     = "../../test/data/test-data/GeoIP2-ISP-Test.mmdb"
 )
 
 func TestOpenDB(t *testing.T) {
@@ -83,6 +84,24 @@ func TestRecordToString(t *testing.T) {
 	a.NotNil(prettyJSON, "records stringified")
 	a.Contains(prettyJSON, "London")
 	a.Contains(prettyJSON, "2643743")
+
+	require.NoError(t, reader.Close())
+}
+
+// TestRecordToStringEscaping tests that certain HTML-related characters are not
+// escaped in the JSON output.
+func TestRecordToStringEscaping(t *testing.T) {
+	a := assert.New(t)
+
+	reader, err := OpenDB(ISPDBPath)
+	a.NoError(err, "no open error")
+	records, err := RecordsForNetwork(*reader, false, "206.16.137.0/24")
+	a.NoError(err, "no RecordsForNetwork error")
+	prettyJSON, err := RecordToString(records)
+
+	a.NoError(err, "no error on stringification")
+	a.NotNil(prettyJSON, "records stringified")
+	a.Contains(prettyJSON, "AT&T Synaptic Cloud Hosting")
 
 	require.NoError(t, reader.Close())
 }

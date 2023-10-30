@@ -2,6 +2,7 @@
 package mmdbinspect
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -120,10 +121,15 @@ func AggregatedRecords(networks, databases []string, includeAliasedNetworks bool
 
 // RecordToString converts an mmdb record into a JSON-formatted string.
 func RecordToString(record any) (string, error) {
-	j, err := json.MarshalIndent(record, "", "    ")
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetEscapeHTML(false) // don't escape ampersands and angle brackets
+	enc.SetIndent("", "    ")
+
+	err := enc.Encode(record)
 	if err != nil {
 		return "", errors.New("could not convert record to string")
 	}
 
-	return string(j), nil
+	return buf.String(), nil
 }
