@@ -87,10 +87,10 @@ Copy mmdbinspect.exe to where you want it to live.
 
 _We aim always to support the current and penultimate major releases of the Go compiler. You can get it at the [Go website](https://golang.org)._
 
-The easiest way is via `go get`:
+The easiest way is via `go install`:
 
 ```bash
-$ go install github.com/maxmind/mmdbinspect/cmd/mmdbinspect
+$ go install github.com/maxmind/mmdbinspect/cmd/mmdbinspect@latest
 ```
 
 This installs `mmdbinspect` to `$GOPATH/bin/mmdbinspect`.
