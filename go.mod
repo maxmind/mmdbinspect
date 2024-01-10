@@ -1,6 +1,6 @@
 module github.com/maxmind/mmdbinspect
 
-go 1.18
+go 1.20
 
 require (
 	github.com/oschwald/maxminddb-golang v1.12.0
