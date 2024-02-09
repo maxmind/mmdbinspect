@@ -104,7 +104,6 @@ func AggregatedRecords(networks, databases []string, includeAliasedNetworks bool
 		for _, thisNetwork := range networks {
 			var records any
 			records, err = RecordsForNetwork(*reader, includeAliasedNetworks, thisNetwork)
-
 			if err != nil {
 				_ = reader.Close()
 				return nil, fmt.Errorf("could not get records from db %v: %w", path, err)
