@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"net"
 	"os"
 	"strings"
@@ -30,10 +31,10 @@ type RecordSet struct {
 func OpenDB(path string) (*maxminddb.Reader, error) {
 	_, err := os.Stat(path)
 
-	if os.IsNotExist(err) {
+	if errors.Is(err, fs.ErrNotExist) {
 		return nil, fmt.Errorf("%v does not exist", path)
 	} else if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("stating %s: %w", path, err)
 	}
 
 	db, err := maxminddb.Open(path)
@@ -84,7 +85,7 @@ func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, may
 	}
 
 	if n.Err() != nil {
-		return nil, n.Err()
+		return nil, fmt.Errorf("traversing networks: %w", n.Err())
 	}
 
 	return found, nil
@@ -93,7 +94,7 @@ func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, may
 // AggregatedRecords returns the aggregated records for the networks and
 // databases provided.
 func AggregatedRecords(networks, databases []string, includeAliasedNetworks bool) (any, error) {
-	recordSets := make([]RecordSet, 0)
+	var recordSets []RecordSet
 
 	for _, path := range databases {
 		reader, err := OpenDB(path)
