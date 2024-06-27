@@ -33,7 +33,8 @@ func OpenDB(path string) (*maxminddb.Reader, error) {
 
 	if errors.Is(err, fs.ErrNotExist) {
 		return nil, fmt.Errorf("%v does not exist", path)
-	} else if err != nil {
+	}
+	if err != nil {
 		return nil, fmt.Errorf("stating %s: %w", path, err)
 	}
 
@@ -45,7 +46,7 @@ func OpenDB(path string) (*maxminddb.Reader, error) {
 	return db, nil
 }
 
-// RecordsForNetwork fetches mmdb records inside a given network.  If an
+// RecordsForNetwork fetches mmdb records inside a given network. If an
 // address is provided without a netmask a /32 will be inferred for v4
 // addresses and a /128 will be inferred for v6 addresses.
 func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, maybeNetwork string) (any, error) {

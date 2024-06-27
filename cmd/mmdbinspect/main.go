@@ -30,7 +30,7 @@ func usage() {
 	)
 	flag.PrintDefaults()
 	fmt.Print(`
-Any additional arguments passed are assumed to be networks to look up.  If an
+Any additional arguments passed are assumed to be networks to look up. If an
 address range is not supplied, /32 will be assumed for ipv4 addresses and /128
 will be assumed for ipv6 addresses.
 `)
