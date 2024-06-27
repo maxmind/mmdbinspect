@@ -2,9 +2,6 @@
 
 `mmdbinspect` - look up records for one or more IPs/networks in one or more .mmdb databases
 
-[![Build Status](https://github.com/maxmind/mmdbinspect/workflows/Build/badge.svg)](https://github.com/maxmind/mmdbinspect/actions?query=workflow%3A%22Build%22)
-[![Coverage Status](https://coveralls.io/repos/github/maxmind/mmdbinspect/badge.svg)](https://coveralls.io/github/maxmind/mmdbinspect)
-
 <!-- vim-markdown-toc GFM -->
 
 * [Usage](#usage)
