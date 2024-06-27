@@ -33,7 +33,8 @@ func OpenDB(path string) (*maxminddb.Reader, error) {
 
 	if errors.Is(err, fs.ErrNotExist) {
 		return nil, fmt.Errorf("%v does not exist", path)
-	} else if err != nil {
+	}
+	if err != nil {
 		return nil, fmt.Errorf("stating %s: %w", path, err)
 	}
 
