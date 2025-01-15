@@ -46,9 +46,9 @@ func OpenDB(path string) (*maxminddb.Reader, error) {
 	return db, nil
 }
 
-// RecordsForNetwork fetches mmdb records inside a given network. If an
-// address is provided without a netmask a /32 will be inferred for v4
-// addresses and a /128 will be inferred for v6 addresses.
+// RecordsForNetwork fetches mmdb records inside a given network. If an IP
+// address is provided without a prefix length, it will be treated as a
+// network containing a single address (i.e., /32 for IPv4 and /128 for IPv6).
 func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, maybeNetwork string) (any, error) {
 	lookupNetwork := maybeNetwork
 
