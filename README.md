@@ -87,7 +87,7 @@ _We aim always to support the current and penultimate major releases of the Go c
 The easiest way is via `go install`:
 
 ```bash
-$ go install github.com/maxmind/mmdbinspect/cmd/mmdbinspect@latest
+$ go install github.com/maxmind/mmdbinspect/v2/cmd/mmdbinspect@latest
 ```
 
 This installs `mmdbinspect` to `$GOPATH/bin/mmdbinspect`.

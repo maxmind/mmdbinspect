@@ -1,4 +1,4 @@
-module github.com/maxmind/mmdbinspect
+module github.com/maxmind/mmdbinspect/v2
 
 go 1.23
 
