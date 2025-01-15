@@ -16,7 +16,7 @@ import (
 
 // RecordForNetwork holds a network and the corresponding record.
 type RecordForNetwork struct {
-	Network string
+	Network netip.Prefix
 	Record  any
 }
 
@@ -80,7 +80,7 @@ func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, may
 			return nil, fmt.Errorf("could not get next network: %w", err)
 		}
 
-		found = append(found, RecordForNetwork{res.Prefix().String(), record})
+		found = append(found, RecordForNetwork{res.Prefix(), record})
 	}
 
 	return found, nil
