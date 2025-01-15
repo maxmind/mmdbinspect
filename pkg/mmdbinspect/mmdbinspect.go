@@ -7,11 +7,11 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"net"
+	"net/netip"
 	"os"
 	"strings"
 
-	"github.com/oschwald/maxminddb-golang"
+	"github.com/oschwald/maxminddb-golang/v2"
 )
 
 // RecordForNetwork holds a network and the corresponding record.
@@ -60,33 +60,27 @@ func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, may
 		}
 	}
 
-	//nolint:forbidigo // preexisting
-	_, network, err := net.ParseCIDR(lookupNetwork)
+	network, err := netip.ParsePrefix(lookupNetwork)
 	if err != nil {
 		return nil, fmt.Errorf("%v is not a valid IP address", maybeNetwork)
 	}
 
-	var n *maxminddb.Networks
+	var opts []maxminddb.NetworksOption
 	if includeAliasedNetworks {
-		n = reader.NetworksWithin(network)
-	} else {
-		n = reader.NetworksWithin(network, maxminddb.SkipAliasedNetworks)
+		opts = append(opts, maxminddb.IncludeAliasedNetworks)
 	}
 
 	var found []any
 
-	for n.Next() {
+	for res := range reader.NetworksWithin(network, opts...) {
 		var record any
-		address, err := n.Network(&record)
+
+		err := res.Decode(&record)
 		if err != nil {
 			return nil, fmt.Errorf("could not get next network: %w", err)
 		}
 
-		found = append(found, RecordForNetwork{address.String(), record})
-	}
-
-	if n.Err() != nil {
-		return nil, fmt.Errorf("traversing networks: %w", n.Err())
+		found = append(found, RecordForNetwork{res.Prefix().String(), record})
 	}
 
 	return found, nil
