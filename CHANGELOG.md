@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 2.0.0
+
+* Upgrade to `github.com/oschwald/maxminddb-golang/v2`. This is a breaking
+  API change, but should not affect the use of the program.
+
 ## 0.2.0 (2024-01-10)
 
 * Don't escape `&`, `<`, and `>` in JSON output

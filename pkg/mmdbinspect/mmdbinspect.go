@@ -7,16 +7,16 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"net"
+	"net/netip"
 	"os"
 	"strings"
 
-	"github.com/oschwald/maxminddb-golang"
+	"github.com/oschwald/maxminddb-golang/v2"
 )
 
 // RecordForNetwork holds a network and the corresponding record.
 type RecordForNetwork struct {
-	Network string
+	Network netip.Prefix
 	Record  any
 }
 
@@ -46,9 +46,9 @@ func OpenDB(path string) (*maxminddb.Reader, error) {
 	return db, nil
 }
 
-// RecordsForNetwork fetches mmdb records inside a given network. If an
-// address is provided without a netmask a /32 will be inferred for v4
-// addresses and a /128 will be inferred for v6 addresses.
+// RecordsForNetwork fetches mmdb records inside a given network. If an IP
+// address is provided without a prefix length, it will be treated as a
+// network containing a single address (i.e., /32 for IPv4 and /128 for IPv6).
 func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, maybeNetwork string) (any, error) {
 	lookupNetwork := maybeNetwork
 
@@ -60,33 +60,27 @@ func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, may
 		}
 	}
 
-	//nolint:forbidigo // preexisting
-	_, network, err := net.ParseCIDR(lookupNetwork)
+	network, err := netip.ParsePrefix(lookupNetwork)
 	if err != nil {
 		return nil, fmt.Errorf("%v is not a valid IP address", maybeNetwork)
 	}
 
-	var n *maxminddb.Networks
+	var opts []maxminddb.NetworksOption
 	if includeAliasedNetworks {
-		n = reader.NetworksWithin(network)
-	} else {
-		n = reader.NetworksWithin(network, maxminddb.SkipAliasedNetworks)
+		opts = append(opts, maxminddb.IncludeAliasedNetworks)
 	}
 
 	var found []any
 
-	for n.Next() {
+	for res := range reader.NetworksWithin(network, opts...) {
 		var record any
-		address, err := n.Network(&record)
+
+		err := res.Decode(&record)
 		if err != nil {
 			return nil, fmt.Errorf("could not get next network: %w", err)
 		}
 
-		found = append(found, RecordForNetwork{address.String(), record})
-	}
-
-	if n.Err() != nil {
-		return nil, fmt.Errorf("traversing networks: %w", n.Err())
+		found = append(found, RecordForNetwork{res.Prefix(), record})
 	}
 
 	return found, nil
