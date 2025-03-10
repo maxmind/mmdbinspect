@@ -67,20 +67,27 @@ func recordsForNetwork(
 	record Record,
 	yield func(*Record, error) bool,
 ) bool {
-	lookupNetwork := record.RequestedLookup
-
-	if !strings.Contains(lookupNetwork, "/") {
-		if strings.Count(lookupNetwork, ":") >= 2 {
-			lookupNetwork = lookupNetwork + "/128"
-		} else {
-			lookupNetwork = lookupNetwork + "/32"
+	var err error
+	var network netip.Prefix
+	if strings.Contains(record.RequestedLookup, "/") {
+		network, err = netip.ParsePrefix(record.RequestedLookup)
+		if err != nil {
+			yield(nil, fmt.Errorf("%s is not a valid network", record.RequestedLookup))
+			return false
 		}
-	}
+	} else {
+		addr, err := netip.ParseAddr(record.RequestedLookup)
+		if err != nil {
+			yield(nil, fmt.Errorf("%s is not a valid IP address", record.RequestedLookup))
+			return false
+		}
 
-	network, err := netip.ParsePrefix(lookupNetwork)
-	if err != nil {
-		yield(nil, fmt.Errorf("%v is not a valid network or IP address", record.RequestedLookup))
-		return false
+		bits := 32
+		if addr.Is6() {
+			bits = 128
+		}
+
+		network = netip.PrefixFrom(addr, bits)
 	}
 
 	var opts []maxminddb.NetworksOption

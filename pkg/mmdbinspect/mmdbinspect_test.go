@@ -200,13 +200,13 @@ func TestAggregatedRecords(t *testing.T) {
 			name:      "invalid lookup IP",
 			dbs:       []string{CityDBPath},
 			networks:  []string{"81.2.69.342"},
-			expectErr: "81.2.69.342 is not a valid network or IP address",
+			expectErr: "81.2.69.342 is not a valid IP address",
 		},
 		{
 			name:      "invalid lookup network",
 			dbs:       []string{CityDBPath},
 			networks:  []string{"81.2.69.42/33"},
-			expectErr: "81.2.69.42/33 is not a valid network or IP address",
+			expectErr: "81.2.69.42/33 is not a valid network",
 		},
 	}
 
