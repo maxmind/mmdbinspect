@@ -24,7 +24,7 @@ type RecordForNetwork struct {
 // RecordSet holds the records for a lookup in a database.
 type RecordSet struct {
 	Database string
-	Records  any
+	Records  []RecordForNetwork
 	Lookup   string
 }
 
@@ -50,7 +50,7 @@ func OpenDB(path string) (*maxminddb.Reader, error) {
 // RecordsForNetwork fetches mmdb records inside a given network. If an IP
 // address is provided without a prefix length, it will be treated as a
 // network containing a single address (i.e., /32 for IPv4 and /128 for IPv6).
-func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, maybeNetwork string) (any, error) {
+func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, maybeNetwork string) ([]RecordForNetwork, error) {
 	lookupNetwork := maybeNetwork
 
 	if !strings.Contains(lookupNetwork, "/") {
@@ -71,7 +71,7 @@ func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, may
 		opts = append(opts, maxminddb.IncludeAliasedNetworks)
 	}
 
-	var found []any
+	var found []RecordForNetwork
 
 	for res := range reader.NetworksWithin(network, opts...) {
 		var record any
@@ -89,7 +89,7 @@ func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, may
 
 // AggregatedRecords returns the aggregated records for the networks and
 // databases provided.
-func AggregatedRecords(networks, databases []string, includeAliasedNetworks bool) (any, error) {
+func AggregatedRecords(networks, databases []string, includeAliasedNetworks bool) ([]RecordSet, error) {
 	var recordSets []RecordSet
 
 	for _, glob := range databases {
@@ -104,8 +104,7 @@ func AggregatedRecords(networks, databases []string, includeAliasedNetworks bool
 			}
 
 			for _, thisNetwork := range networks {
-				var records any
-				records, err = RecordsForNetwork(*reader, includeAliasedNetworks, thisNetwork)
+				records, err := RecordsForNetwork(*reader, includeAliasedNetworks, thisNetwork)
 				if err != nil {
 					_ = reader.Close()
 					return nil, fmt.Errorf("could not get records from db %q: %w", path, err)
@@ -122,7 +121,7 @@ func AggregatedRecords(networks, databases []string, includeAliasedNetworks bool
 }
 
 // RecordToString converts an mmdb record into a JSON-formatted string.
-func RecordToString(record any) (string, error) {
+func RecordToString(record []RecordSet) (string, error) {
 	var buf bytes.Buffer
 	enc := json.NewEncoder(&buf)
 	enc.SetEscapeHTML(false) // don't escape ampersands and angle brackets

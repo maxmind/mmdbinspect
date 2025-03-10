@@ -84,7 +84,7 @@ func TestRecordToString(t *testing.T) {
 	require.NoError(t, err, "no open error")
 	records, err := RecordsForNetwork(*reader, false, "81.2.69.142")
 	require.NoError(t, err, "no RecordsForNetwork error")
-	prettyJSON, err := RecordToString(records)
+	prettyJSON, err := RecordToString([]RecordSet{{Records: records}})
 
 	require.NoError(t, err, "no error on stringification")
 	a.NotNil(prettyJSON, "records stringified")
@@ -103,7 +103,7 @@ func TestRecordToStringEscaping(t *testing.T) {
 	require.NoError(t, err, "no open error")
 	records, err := RecordsForNetwork(*reader, false, "206.16.137.0/24")
 	require.NoError(t, err, "no RecordsForNetwork error")
-	prettyJSON, err := RecordToString(records)
+	prettyJSON, err := RecordToString([]RecordSet{{Records: records}})
 
 	require.NoError(t, err, "no error on stringification")
 	a.NotNil(prettyJSON, "records stringified")
@@ -246,8 +246,8 @@ func TestAggregatedRecords(t *testing.T) {
 			expected: []RecordSet{
 				{
 					Database: CityDBPath,
-					Records: []any{
-						RecordForNetwork{
+					Records: []RecordForNetwork{
+						{
 							Network: netip.MustParsePrefix("81.2.69.142/31"),
 							Record:  city81_2_69_142,
 						},
@@ -256,13 +256,12 @@ func TestAggregatedRecords(t *testing.T) {
 				},
 				{
 					Database: CityDBPath,
-					Records:  []any(nil),
 					Lookup:   "8.8.8.8",
 				},
 				{
 					Database: CountryDBPath,
-					Records: []any{
-						RecordForNetwork{
+					Records: []RecordForNetwork{
+						{
 							Network: netip.MustParsePrefix("81.2.69.142/31"),
 							Record:  country81_2_69_142,
 						},
@@ -271,7 +270,6 @@ func TestAggregatedRecords(t *testing.T) {
 				},
 				{
 					Database: CountryDBPath,
-					Records:  []any(nil),
 					Lookup:   "8.8.8.8",
 				},
 			},
@@ -283,8 +281,8 @@ func TestAggregatedRecords(t *testing.T) {
 			expected: []RecordSet{
 				{
 					Database: CityDBPath,
-					Records: []any{
-						RecordForNetwork{
+					Records: []RecordForNetwork{
+						{
 							Network: netip.MustParsePrefix("81.2.69.142/31"),
 							Record:  city81_2_69_142,
 						},
@@ -293,8 +291,8 @@ func TestAggregatedRecords(t *testing.T) {
 				},
 				{
 					Database: CountryDBPath,
-					Records: []any{
-						RecordForNetwork{
+					Records: []RecordForNetwork{
+						{
 							Network: netip.MustParsePrefix("81.2.69.142/31"),
 							Record:  country81_2_69_142,
 						},
