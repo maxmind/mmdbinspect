@@ -28,7 +28,8 @@ func main() {
 
 	flag.Var(&mmdb, "db", "Path to an mmdb file. You may pass this arg more than once.")
 	includeAliasedNetworks := flag.Bool(
-		"include-aliased-networks", false,
+		"include-aliased-networks",
+		false,
 		"Include aliased networks (e.g. 6to4, Teredo). This option may cause IPv4 networks to be listed more than once via aliases.", //nolint: lll
 	)
 

@@ -39,7 +39,10 @@ func TestOpenDB(t *testing.T) {
 
 	reader, err = OpenDB("../../test/data/test-data/README.md")
 	require.Error(t, err)
-	a.Contains(err.Error(), "README.md could not be opened: error opening database: invalid MaxMind DB file")
+	a.Contains(
+		err.Error(),
+		"README.md could not be opened: error opening database: invalid MaxMind DB file",
+	)
 	a.Nil(reader)
 
 	reader, err = OpenDB("../../test/data/test-data/GeoIP2-City-Test-Invalid-Node-Count.mmdb")

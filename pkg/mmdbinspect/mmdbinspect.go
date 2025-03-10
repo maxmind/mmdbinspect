@@ -50,7 +50,11 @@ func OpenDB(path string) (*maxminddb.Reader, error) {
 // RecordsForNetwork fetches mmdb records inside a given network. If an IP
 // address is provided without a prefix length, it will be treated as a
 // network containing a single address (i.e., /32 for IPv4 and /128 for IPv6).
-func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, maybeNetwork string) ([]RecordForNetwork, error) {
+func RecordsForNetwork(
+	reader maxminddb.Reader,
+	includeAliasedNetworks bool,
+	maybeNetwork string,
+) ([]RecordForNetwork, error) {
 	lookupNetwork := maybeNetwork
 
 	if !strings.Contains(lookupNetwork, "/") {
@@ -89,7 +93,10 @@ func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, may
 
 // AggregatedRecords returns the aggregated records for the networks and
 // databases provided.
-func AggregatedRecords(networks, databases []string, includeAliasedNetworks bool) ([]RecordSet, error) {
+func AggregatedRecords(
+	networks, databases []string,
+	includeAliasedNetworks bool,
+) ([]RecordSet, error) {
 	var recordSets []RecordSet
 
 	for _, glob := range databases {
