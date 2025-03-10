@@ -67,7 +67,9 @@ func main() {
 		Encode(any) error
 	}
 	if *useJSONL {
-		encoder = json.NewEncoder(w)
+		enc := json.NewEncoder(w)
+		enc.SetEscapeHTML(false) // don't escape ampersands and angle brackets
+		encoder = enc
 	} else {
 		encoder = yaml.NewEncoder(w)
 	}
