@@ -2,11 +2,16 @@
 
 ## 2.0.0
 
-* The output format has been flattened. When outputting to JSON, there is
-  now one JSON object per line, containing the following keys: `database_path`,
-  `requested_lookup`, `network`, and `record`. This allows for efficient
-  streaming of large lookups, makes the key naming more consistent, and
-  reduces the depth of the data structure.
+* The default output format is now YAML. This was done to improve the
+  readability when using the tool as a standalone utility for doing lookups
+  in an MMDB database. Use the `-jsonl` flag to output as JSONL instead.
+* When outputting as JSON, we now use JSONL. There is one JSON object per
+  line.
+* The output format has been flattened. Each record that is output now
+  contains the following keys: `database_path`, `requested_lookup`,
+  `network`, and `record`. This allows for efficient streaming of large
+  lookups, makes the key naming more consistent, and reduces the depth of
+  the data structure.
 * Upgrade to `github.com/oschwald/maxminddb-golang/v2`. This is a breaking
   API change, but should not affect the use of the program.
 * You may now use a glob for the `-db` argument. If there are multiple

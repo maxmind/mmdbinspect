@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/goccy/go-yaml"
 	"github.com/maxmind/mmdbinspect/v2/pkg/mmdbinspect"
 )
 
@@ -34,6 +35,8 @@ func main() {
 		"Include aliased networks (e.g. 6to4, Teredo). This option may cause IPv4 networks to be listed more than once via aliases.", //nolint: lll
 	)
 
+	useJSONL := flag.Bool("jsonl", false, "Output as JSONL instead of YAML.")
+
 	flag.Usage = usage
 	flag.Parse()
 
@@ -52,7 +55,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	encoder := json.NewEncoder(os.Stdout)
+	w := os.Stdout
+
+	var encoder interface {
+		Encode(any) error
+	}
+	if *useJSONL {
+		encoder = json.NewEncoder(w)
+	} else {
+		encoder = yaml.NewEncoder(w)
+	}
 
 	iterator := mmdbinspect.Records(network, mmdb, *includeAliasedNetworks)
 
