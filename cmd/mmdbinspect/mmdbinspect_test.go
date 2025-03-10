@@ -1,4 +1,4 @@
-package mmdbinspect
+package main
 
 import (
 	"net/netip"
@@ -139,19 +139,19 @@ var country81_2_69_142 = map[string]any{
 	},
 }
 
-func TestAggregatedRecords(t *testing.T) {
+func TestRecords(t *testing.T) {
 	tests := []struct {
 		name          string
 		dbs           []string
 		networks      []string
-		expectRecords []Record
+		expectRecords []record
 		expectErr     string
 	}{
 		{
 			name:     "multiple non-glob paths and multiple IPs",
 			dbs:      []string{CityDBPath, CountryDBPath},
 			networks: []string{"81.2.69.142", "8.8.8.8"},
-			expectRecords: []Record{
+			expectRecords: []record{
 				{
 					DatabasePath:    CityDBPath,
 					RequestedLookup: "81.2.69.142",
@@ -170,7 +170,7 @@ func TestAggregatedRecords(t *testing.T) {
 			name:     "glob path",
 			dbs:      []string{filepath.Join(testDataDir, "GeoIP2-C*y-Test.mmdb")},
 			networks: []string{"81.2.69.142"},
-			expectRecords: []Record{
+			expectRecords: []record{
 				{
 					DatabasePath:    CityDBPath,
 					RequestedLookup: "81.2.69.142",
@@ -212,8 +212,8 @@ func TestAggregatedRecords(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			var records []Record
-			for record, err := range Records(test.networks, test.dbs, false) {
+			var recs []record
+			for record, err := range records(test.networks, test.dbs, false) {
 				// For now, we don't test errors that happen half way through an
 				// iteration. If we want to in the future, we will need to rework
 				// this a bit.
@@ -224,11 +224,11 @@ func TestAggregatedRecords(t *testing.T) {
 				}
 
 				if err == nil {
-					records = append(records, *record)
+					recs = append(recs, *record)
 				}
 			}
 
-			assert.Equal(t, test.expectRecords, records)
+			assert.Equal(t, test.expectRecords, recs)
 		})
 	}
 }

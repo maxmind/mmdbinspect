@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/goccy/go-yaml"
-	"github.com/maxmind/mmdbinspect/v2/pkg/mmdbinspect"
 )
 
 type arrayFlags []string
@@ -66,7 +65,7 @@ func main() {
 		encoder = yaml.NewEncoder(w)
 	}
 
-	iterator := mmdbinspect.Records(network, mmdb, *includeAliasedNetworks)
+	iterator := records(network, mmdb, *includeAliasedNetworks)
 
 	for r, err := range iterator {
 		if err != nil {

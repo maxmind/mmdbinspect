@@ -1,5 +1,4 @@
-// Package mmdbinspect peeks at the contents of .mmdb files
-package mmdbinspect
+package main
 
 import (
 	"errors"
@@ -14,21 +13,21 @@ import (
 	"github.com/oschwald/maxminddb-golang/v2"
 )
 
-// Record holds the records for a lookup in a database.
-type Record struct {
+// record holds the records for a lookup in a database.
+type record struct {
 	DatabasePath    string       `json:"database_path"`
 	RequestedLookup string       `json:"requested_lookup"`
 	Network         netip.Prefix `json:"network"`
 	Record          any          `json:"record"`
 }
 
-// Records returns an iterator over the records for the networks and
+// records returns an iterator over the records for the networks and
 // databases provided.
-func Records(
+func records(
 	networks, databases []string,
 	includeAliasedNetworks bool,
-) iter.Seq2[*Record, error] {
-	return func(yield func(*Record, error) bool) {
+) iter.Seq2[*record, error] {
+	return func(yield func(*record, error) bool) {
 		for _, glob := range databases {
 			matches, err := filepath.Glob(glob)
 			if err != nil {
@@ -43,7 +42,7 @@ func Records(
 				}
 
 				for _, thisNetwork := range networks {
-					baseRecord := Record{
+					baseRecord := record{
 						DatabasePath:    path,
 						RequestedLookup: thisNetwork,
 					}
@@ -64,8 +63,8 @@ func Records(
 func recordsForNetwork(
 	reader *maxminddb.Reader,
 	includeAliasedNetworks bool,
-	record Record,
-	yield func(*Record, error) bool,
+	record record,
+	yield func(*record, error) bool,
 ) bool {
 	var err error
 	var network netip.Prefix

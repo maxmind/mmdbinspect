@@ -12,12 +12,12 @@
   `network`, and `record`. This allows for efficient streaming of large
   lookups, makes the key naming more consistent, and reduces the depth of
   the data structure.
-* Upgrade to `github.com/oschwald/maxminddb-golang/v2`. This is a breaking
-  API change, but should not affect the use of the program.
 * You may now use a glob for the `-db` argument. If there are multiple
   matches, it will be treated as if multiple `-db` arguments were provided.
   Note that you must quote the parameter when using globs to prevent the
   shell's globbing from interfering. See the [pattern syntax](https://pkg.go.dev/path#Match)
+* This repo no longer provides a public Go API. It is only intended to be
+  used as a CLI program.
 
 ## 0.2.0 (2024-01-10)
 
