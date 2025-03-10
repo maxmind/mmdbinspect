@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"net/netip"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/oschwald/maxminddb-golang/v2"
@@ -91,24 +92,30 @@ func RecordsForNetwork(reader maxminddb.Reader, includeAliasedNetworks bool, may
 func AggregatedRecords(networks, databases []string, includeAliasedNetworks bool) (any, error) {
 	var recordSets []RecordSet
 
-	for _, path := range databases {
-		reader, err := OpenDB(path)
+	for _, glob := range databases {
+		matches, err := filepath.Glob(glob)
 		if err != nil {
-			return nil, fmt.Errorf("could not open database %v: %w", path, err)
+			return nil, fmt.Errorf("invalid file path or glob %q: %w", glob, err)
 		}
-
-		for _, thisNetwork := range networks {
-			var records any
-			records, err = RecordsForNetwork(*reader, includeAliasedNetworks, thisNetwork)
+		for _, path := range matches {
+			reader, err := OpenDB(path)
 			if err != nil {
-				_ = reader.Close()
-				return nil, fmt.Errorf("could not get records from db %v: %w", path, err)
+				return nil, fmt.Errorf("could not open database %q: %w", path, err)
 			}
 
-			set := RecordSet{path, records, thisNetwork}
-			recordSets = append(recordSets, set)
+			for _, thisNetwork := range networks {
+				var records any
+				records, err = RecordsForNetwork(*reader, includeAliasedNetworks, thisNetwork)
+				if err != nil {
+					_ = reader.Close()
+					return nil, fmt.Errorf("could not get records from db %q: %w", path, err)
+				}
+
+				set := RecordSet{path, records, thisNetwork}
+				recordSets = append(recordSets, set)
+			}
+			_ = reader.Close()
 		}
-		_ = reader.Close()
 	}
 
 	return recordSets, nil
