@@ -28,29 +28,46 @@ type RecordSet struct {
 	Lookup   string
 }
 
-// OpenDB returns a maxminddb.Reader.
-func OpenDB(path string) (*maxminddb.Reader, error) {
-	_, err := os.Stat(path)
+// AggregatedRecords returns the aggregated records for the networks and
+// databases provided.
+func AggregatedRecords(
+	networks, databases []string,
+	includeAliasedNetworks bool,
+) ([]RecordSet, error) {
+	var recordSets []RecordSet
 
-	if errors.Is(err, fs.ErrNotExist) {
-		return nil, fmt.Errorf("%v does not exist", path)
-	}
-	if err != nil {
-		return nil, fmt.Errorf("stating %s: %w", path, err)
+	for _, glob := range databases {
+		matches, err := filepath.Glob(glob)
+		if err != nil {
+			return nil, fmt.Errorf("invalid file path or glob %q: %w", glob, err)
+		}
+		for _, path := range matches {
+			reader, err := openDB(path)
+			if err != nil {
+				return nil, fmt.Errorf("could not open database %q: %w", path, err)
+			}
+
+			for _, thisNetwork := range networks {
+				records, err := recordsForNetwork(*reader, includeAliasedNetworks, thisNetwork)
+				if err != nil {
+					_ = reader.Close()
+					return nil, fmt.Errorf("could not get records from db %q: %w", path, err)
+				}
+
+				set := RecordSet{path, records, thisNetwork}
+				recordSets = append(recordSets, set)
+			}
+			_ = reader.Close()
+		}
 	}
 
-	db, err := maxminddb.Open(path)
-	if err != nil {
-		return nil, fmt.Errorf("%v could not be opened: %w", path, err)
-	}
-
-	return db, nil
+	return recordSets, nil
 }
 
-// RecordsForNetwork fetches mmdb records inside a given network. If an IP
+// recordsForNetwork fetches mmdb records inside a given network. If an IP
 // address is provided without a prefix length, it will be treated as a
 // network containing a single address (i.e., /32 for IPv4 and /128 for IPv6).
-func RecordsForNetwork(
+func recordsForNetwork(
 	reader maxminddb.Reader,
 	includeAliasedNetworks bool,
 	maybeNetwork string,
@@ -91,40 +108,23 @@ func RecordsForNetwork(
 	return found, nil
 }
 
-// AggregatedRecords returns the aggregated records for the networks and
-// databases provided.
-func AggregatedRecords(
-	networks, databases []string,
-	includeAliasedNetworks bool,
-) ([]RecordSet, error) {
-	var recordSets []RecordSet
+// openDB returns a maxminddb.Reader.
+func openDB(path string) (*maxminddb.Reader, error) {
+	_, err := os.Stat(path)
 
-	for _, glob := range databases {
-		matches, err := filepath.Glob(glob)
-		if err != nil {
-			return nil, fmt.Errorf("invalid file path or glob %q: %w", glob, err)
-		}
-		for _, path := range matches {
-			reader, err := OpenDB(path)
-			if err != nil {
-				return nil, fmt.Errorf("could not open database %q: %w", path, err)
-			}
-
-			for _, thisNetwork := range networks {
-				records, err := RecordsForNetwork(*reader, includeAliasedNetworks, thisNetwork)
-				if err != nil {
-					_ = reader.Close()
-					return nil, fmt.Errorf("could not get records from db %q: %w", path, err)
-				}
-
-				set := RecordSet{path, records, thisNetwork}
-				recordSets = append(recordSets, set)
-			}
-			_ = reader.Close()
-		}
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil, fmt.Errorf("%v does not exist", path)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("stating %s: %w", path, err)
 	}
 
-	return recordSets, nil
+	db, err := maxminddb.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("%v could not be opened: %w", path, err)
+	}
+
+	return db, nil
 }
 
 // RecordToString converts an mmdb record into a JSON-formatted string.

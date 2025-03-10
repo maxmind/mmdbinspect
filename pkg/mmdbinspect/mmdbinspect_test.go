@@ -25,11 +25,11 @@ func TestOpenDB(t *testing.T) {
 
 	a.FileExists(CityDBPath, "database exists")
 
-	reader, err := OpenDB(CityDBPath)
+	reader, err := openDB(CityDBPath)
 	require.NoError(t, err, "no open error")
 	a.IsType(maxminddb.Reader{}, *reader)
 
-	reader, err = OpenDB("foo/bar/baz")
+	reader, err = openDB("foo/bar/baz")
 	require.Error(t, err, "open error when file does not exist")
 	a.Nil(reader)
 	a.Equal(
@@ -37,7 +37,7 @@ func TestOpenDB(t *testing.T) {
 		err.Error(),
 	)
 
-	reader, err = OpenDB("../../test/data/test-data/README.md")
+	reader, err = openDB("../../test/data/test-data/README.md")
 	require.Error(t, err)
 	a.Contains(
 		err.Error(),
@@ -45,7 +45,7 @@ func TestOpenDB(t *testing.T) {
 	)
 	a.Nil(reader)
 
-	reader, err = OpenDB("../../test/data/test-data/GeoIP2-City-Test-Invalid-Node-Count.mmdb")
+	reader, err = openDB("../../test/data/test-data/GeoIP2-City-Test-Invalid-Node-Count.mmdb")
 	require.Error(t, err)
 	a.Contains(err.Error(), "invalid metadata")
 	a.Nil(reader)
@@ -57,22 +57,22 @@ func TestOpenDB(t *testing.T) {
 
 func TestRecordsForNetwork(t *testing.T) {
 	a := assert.New(t)
-	reader, err := OpenDB(CityDBPath) // ipv6 database
+	reader, err := openDB(CityDBPath) // ipv6 database
 	require.NoError(t, err, "no open error")
 
-	records, err := RecordsForNetwork(*reader, false, "81.2.69.142")
+	records, err := recordsForNetwork(*reader, false, "81.2.69.142")
 	require.NoError(t, err, "no error on lookup of 81.2.69.142")
 	a.NotNil(records, "records returned")
 
-	records, err = RecordsForNetwork(*reader, false, "81.2.69.0/24")
+	records, err = recordsForNetwork(*reader, false, "81.2.69.0/24")
 	require.NoError(t, err, "no error on lookup of 81.2.69.0/24")
 	a.NotNil(records, "records returned")
 
-	records, err = RecordsForNetwork(*reader, false, "10.255.255.255/29")
+	records, err = recordsForNetwork(*reader, false, "10.255.255.255/29")
 	require.NoError(t, err, "got no error when IP not found")
 	a.Nil(records, "no records returned for 10.255.255.255/29")
 
-	records, err = RecordsForNetwork(*reader, false, "X.X.Y.Z")
+	records, err = recordsForNetwork(*reader, false, "X.X.Y.Z")
 	require.Error(t, err, "got an error")
 	a.Nil(records, "no records returned for X.X.Y.Z")
 	a.Equal("X.X.Y.Z is not a valid IP address", err.Error())
@@ -83,10 +83,10 @@ func TestRecordsForNetwork(t *testing.T) {
 func TestRecordToString(t *testing.T) {
 	a := assert.New(t)
 
-	reader, err := OpenDB(CityDBPath)
+	reader, err := openDB(CityDBPath)
 	require.NoError(t, err, "no open error")
-	records, err := RecordsForNetwork(*reader, false, "81.2.69.142")
-	require.NoError(t, err, "no RecordsForNetwork error")
+	records, err := recordsForNetwork(*reader, false, "81.2.69.142")
+	require.NoError(t, err, "no recordsForNetwork error")
 	prettyJSON, err := RecordToString([]RecordSet{{Records: records}})
 
 	require.NoError(t, err, "no error on stringification")
@@ -102,10 +102,10 @@ func TestRecordToString(t *testing.T) {
 func TestRecordToStringEscaping(t *testing.T) {
 	a := assert.New(t)
 
-	reader, err := OpenDB(ISPDBPath)
+	reader, err := openDB(ISPDBPath)
 	require.NoError(t, err, "no open error")
-	records, err := RecordsForNetwork(*reader, false, "206.16.137.0/24")
-	require.NoError(t, err, "no RecordsForNetwork error")
+	records, err := recordsForNetwork(*reader, false, "206.16.137.0/24")
+	require.NoError(t, err, "no recordsForNetwork error")
 	prettyJSON, err := RecordToString([]RecordSet{{Records: records}})
 
 	require.NoError(t, err, "no error on stringification")
