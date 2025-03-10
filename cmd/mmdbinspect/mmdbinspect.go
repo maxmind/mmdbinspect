@@ -9,13 +9,16 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/oschwald/maxminddb-golang/v2"
 )
 
-// record holds the records for a lookup in a database.
+// record holds the records for a lookup in a database. Note that
+// the order here affects the output order.
 type record struct {
 	DatabasePath    string       `json:"database_path"`
+	BuildTime       *time.Time   `json:"build_time,omitempty"`
 	RequestedLookup string       `json:"requested_lookup"`
 	Network         netip.Prefix `json:"network"`
 	Record          any          `json:"record,omitempty"`
@@ -26,6 +29,7 @@ type record struct {
 func records(
 	networks, databases []string,
 	includeAliasedNetworks,
+	includeBuildTime,
 	includeNetworksWithoutData bool,
 ) iter.Seq2[*record, error] {
 	var opts []maxminddb.NetworksOption
@@ -50,9 +54,17 @@ func records(
 					return
 				}
 
+				var buildTime *time.Time
+				if includeBuildTime {
+					//nolint:gosec // not a security issue.
+					t := time.Unix(int64(reader.Metadata.BuildEpoch), 0).UTC()
+					buildTime = &t
+				}
+
 				for _, thisNetwork := range networks {
 					baseRecord := record{
 						DatabasePath:    path,
+						BuildTime:       buildTime,
 						RequestedLookup: thisNetwork,
 					}
 					ok := recordsForNetwork(reader, opts, baseRecord, yield)

@@ -4,6 +4,7 @@ import (
 	"net/netip"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -140,10 +141,13 @@ var country81_2_69_142 = map[string]any{
 }
 
 func TestRecords(t *testing.T) {
+	countryBuildTime := time.Date(2019, 11, 4, 16, 30, 59, 0, time.UTC)
+
 	tests := []struct {
 		name                       string
 		dbs                        []string
 		networks                   []string
+		includeBuildTime           bool
 		includeNetworksWithoutData bool
 		expectRecords              []record
 		expectErr                  string
@@ -161,6 +165,21 @@ func TestRecords(t *testing.T) {
 				},
 				{
 					DatabasePath:    CountryDBPath,
+					RequestedLookup: "81.2.69.142",
+					Network:         netip.MustParsePrefix("81.2.69.142/31"),
+					Record:          country81_2_69_142,
+				},
+			},
+		},
+		{
+			name:             "with build time",
+			dbs:              []string{CountryDBPath},
+			networks:         []string{"81.2.69.142"},
+			includeBuildTime: true,
+			expectRecords: []record{
+				{
+					DatabasePath:    CountryDBPath,
+					BuildTime:       &countryBuildTime,
 					RequestedLookup: "81.2.69.142",
 					Network:         netip.MustParsePrefix("81.2.69.142/31"),
 					Record:          country81_2_69_142,
@@ -227,7 +246,14 @@ func TestRecords(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			var recs []record
-			for record, err := range records(test.networks, test.dbs, false, test.includeNetworksWithoutData) {
+			iterator := records(
+				test.networks,
+				test.dbs,
+				false,
+				test.includeBuildTime,
+				test.includeNetworksWithoutData,
+			)
+			for record, err := range iterator {
 				// For now, we don't test errors that happen half way through an
 				// iteration. If we want to in the future, we will need to rework
 				// this a bit.

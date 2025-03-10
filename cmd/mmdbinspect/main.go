@@ -35,6 +35,12 @@ func main() {
 		"Include aliased networks (e.g. 6to4, Teredo). This option may cause IPv4 networks to be listed more than once via aliases.", //nolint: lll
 	)
 
+	includeBuildTime := flag.Bool(
+		"include-build-time",
+		false,
+		"Include the build time of the database in the output.",
+	)
+
 	includeNetworksWithoutData := flag.Bool(
 		"include-networks-without-data",
 		false,
@@ -78,6 +84,7 @@ func main() {
 		network,
 		mmdb,
 		*includeAliasedNetworks,
+		*includeBuildTime,
 		*includeNetworksWithoutData,
 	)
 
