@@ -36,7 +36,7 @@ Any IPs specified will be treated as their single-host network counterparts (e.g
 
 `mmdbinspect` will look up each IP/network in each database specified. For each IP/network looked up in a database, the program will select all records for networks which are contained within the looked up IP/network. If no records for contained networks are found in the datafile, the program will select the record that is contained by the looked up IP/network. If no such records are found, none are selected.
 
-The program outputs the selected records as a JSON array, with each item in the array corresponding to a single IP/network being looked up in a single DB. The `Database` and `Lookup` keys are added to each item to help correlate which set of records resulted from looking up which IP/network in which database.
+The program outputs the selected records as a JSON array, with each item in the array corresponding to a single IP/network being looked up in a single DB. The `database` and `requested_lookup` keys are added to each item to help correlate which set of records resulted from looking up which IP/network in which database.
 
 ## Beta Release
 
@@ -424,45 +424,45 @@ $ cat list.txt | xargs mmdbinspect -db GeoIP2-ISP.mmdb
 
 Print out the `isp` field from each result found:
 ```bash
-$ mmdbinspect -db GeoIP2-ISP.mmdb 152.216.7.32/27 | jq -r '.[].Records[].Record.isp'
+$ mmdbinspect -db GeoIP2-ISP.mmdb 152.216.7.32/27 | jq -r '.record.isp'
 Internal Revenue Service
 ```
 
 Print out the `isp` field from each result found in a specific format using string addition:
 ```bash
-$ mmdbinspect -db GeoIP2-ISP.mmdb 152.216.7.32/27 | jq -r '.[].Records[].Record | "isp=" + .isp'
+$ mmdbinspect -db GeoIP2-ISP.mmdb 152.216.7.32/27 | jq -r '.record | "isp=" + .isp'
 isp=Internal Revenue Service
 ```
 
 Print out the `city` and `country` names from each record using string addition:
 ```bash
-$ mmdbinspect -db GeoIP2-City.mmdb 2610:30::/64 | jq -r '.[].Records[].Record | .city.names.en + ", " + .country.names.en'
+$ mmdbinspect -db GeoIP2-City.mmdb 2610:30::/64 | jq -r '.record | .city.names.en + ", " + .country.names.en'
 Martinsburg, United States
 ```
 
 Print out the `city` and `country` names from each record using array construction and `join`:
 ```bash
-$ mmdbinspect -db GeoIP2-City.mmdb 2610:30::/64 | jq -r '.[].Records[].Record | [.city.names.en, .country.names.en] | join(", ")'
+$ mmdbinspect -db GeoIP2-City.mmdb 2610:30::/64 | jq -r '.record | [.city.names.en, .country.names.en] | join(", ")'
 Martinsburg, United States
 ```
 
 Get the AS number for an IP:
 ```bash
-$ mmdbinspect -db GeoLite2-ASN.mmdb 152.216.7.49 | jq -r '.[].Records[].Record.autonomous_system_number'
+$ mmdbinspect -db GeoLite2-ASN.mmdb 152.216.7.49 | jq -r '.record.autonomous_system_number'
 30313
 ```
 
 When asking `jq` to print a path it can't find, it'll print `null`:
 ```bash
-$ mmdbinspect -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.[].invalid.path'
+$ mmdbinspect -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.invalid.path'
 null
 ```
 
 When asking `jq` to concatenate or join a path it can't find, it'll leave it blank:
 ```bash
-$ mmdbinspect -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.[].Records[].Record | .city.names.en + ", " + .country.names.en'
+$ mmdbinspect -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.record | .city.names.en + ", " + .country.names.en'
 , United States
-$ mmdbinspect -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.[].Records[].Record | [.city.names.en, .country.names.en] | join(", ")'
+$ mmdbinspect -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.record | [.city.names.en, .country.names.en] | join(", ")'
 , United States
 ```
 </details>

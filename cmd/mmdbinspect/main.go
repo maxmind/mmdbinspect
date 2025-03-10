@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -51,17 +52,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	records, err := mmdbinspect.AggregatedRecords(network, mmdb, *includeAliasedNetworks)
-	if err != nil {
-		log.Fatal(err)
-	}
+	encoder := json.NewEncoder(os.Stdout)
 
-	json, err := mmdbinspect.RecordToString(records)
-	if err != nil {
-		log.Fatal(err)
-	}
+	iterator := mmdbinspect.Records(network, mmdb, *includeAliasedNetworks)
 
-	fmt.Printf("%v\n", json)
+	for r, err := range iterator {
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = encoder.Encode(r)
+		if err != nil {
+			log.Fatal(fmt.Errorf("encoding record: %w", err))
+		}
+	}
 }
 
 func usage() {

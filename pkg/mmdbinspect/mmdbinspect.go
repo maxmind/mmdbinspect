@@ -2,11 +2,10 @@
 package mmdbinspect
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
+	"iter"
 	"net/netip"
 	"os"
 	"path/filepath"
@@ -15,76 +14,73 @@ import (
 	"github.com/oschwald/maxminddb-golang/v2"
 )
 
-// RecordForNetwork holds a network and the corresponding record.
-type RecordForNetwork struct {
-	Network netip.Prefix
-	Record  any
+// Record holds the records for a lookup in a database.
+type Record struct {
+	DatabasePath    string       `json:"database_path"`
+	RequestedLookup string       `json:"requested_lookup"`
+	Network         netip.Prefix `json:"network"`
+	Record          any          `json:"record"`
 }
 
-// RecordSet holds the records for a lookup in a database.
-type RecordSet struct {
-	Database string
-	Records  []RecordForNetwork
-	Lookup   string
-}
-
-// AggregatedRecords returns the aggregated records for the networks and
+// Records returns an iterator over the records for the networks and
 // databases provided.
-func AggregatedRecords(
+func Records(
 	networks, databases []string,
 	includeAliasedNetworks bool,
-) ([]RecordSet, error) {
-	var recordSets []RecordSet
-
-	for _, glob := range databases {
-		matches, err := filepath.Glob(glob)
-		if err != nil {
-			return nil, fmt.Errorf("invalid file path or glob %q: %w", glob, err)
-		}
-		for _, path := range matches {
-			reader, err := openDB(path)
+) iter.Seq2[*Record, error] {
+	return func(yield func(*Record, error) bool) {
+		for _, glob := range databases {
+			matches, err := filepath.Glob(glob)
 			if err != nil {
-				return nil, fmt.Errorf("could not open database %q: %w", path, err)
+				yield(nil, fmt.Errorf("invalid file path or glob %q: %w", glob, err))
+				return
 			}
-
-			for _, thisNetwork := range networks {
-				records, err := recordsForNetwork(*reader, includeAliasedNetworks, thisNetwork)
+			for _, path := range matches {
+				reader, err := openDB(path)
 				if err != nil {
-					_ = reader.Close()
-					return nil, fmt.Errorf("could not get records from db %q: %w", path, err)
+					yield(nil, fmt.Errorf("could not open database %q: %w", path, err))
+					return
 				}
 
-				set := RecordSet{path, records, thisNetwork}
-				recordSets = append(recordSets, set)
+				for _, thisNetwork := range networks {
+					baseRecord := Record{
+						DatabasePath:    path,
+						RequestedLookup: thisNetwork,
+					}
+					ok := recordsForNetwork(reader, includeAliasedNetworks, baseRecord, yield)
+					if !ok {
+						return
+					}
+				}
+				_ = reader.Close()
 			}
-			_ = reader.Close()
 		}
 	}
-
-	return recordSets, nil
 }
 
 // recordsForNetwork fetches mmdb records inside a given network. If an IP
 // address is provided without a prefix length, it will be treated as a
 // network containing a single address (i.e., /32 for IPv4 and /128 for IPv6).
 func recordsForNetwork(
-	reader maxminddb.Reader,
+	reader *maxminddb.Reader,
 	includeAliasedNetworks bool,
-	maybeNetwork string,
-) ([]RecordForNetwork, error) {
-	lookupNetwork := maybeNetwork
+	record Record,
+	yield func(*Record, error) bool,
+) bool {
+	lookupNetwork := record.RequestedLookup
 
 	if !strings.Contains(lookupNetwork, "/") {
-		if strings.Count(maybeNetwork, ":") >= 2 {
-			lookupNetwork = maybeNetwork + "/128"
+		if strings.Count(lookupNetwork, ":") >= 2 {
+			lookupNetwork = lookupNetwork + "/128"
 		} else {
-			lookupNetwork = maybeNetwork + "/32"
+			lookupNetwork = lookupNetwork + "/32"
 		}
 	}
 
 	network, err := netip.ParsePrefix(lookupNetwork)
 	if err != nil {
-		return nil, fmt.Errorf("%v is not a valid IP address", maybeNetwork)
+		yield(nil, fmt.Errorf("%v is not a valid network or IP address", record.RequestedLookup))
+		return false
 	}
 
 	var opts []maxminddb.NetworksOption
@@ -92,20 +88,22 @@ func recordsForNetwork(
 		opts = append(opts, maxminddb.IncludeAliasedNetworks)
 	}
 
-	var found []RecordForNetwork
-
 	for res := range reader.NetworksWithin(network, opts...) {
-		var record any
+		record.Network = res.Prefix()
 
-		err := res.Decode(&record)
+		err := res.Decode(&record.Record)
 		if err != nil {
-			return nil, fmt.Errorf("could not get next network: %w", err)
+			yield(nil, fmt.Errorf("could not get next network: %w", err))
+			return false
 		}
 
-		found = append(found, RecordForNetwork{res.Prefix(), record})
+		ok := yield(&record, nil)
+		if !ok {
+			return false
+		}
 	}
 
-	return found, nil
+	return true
 }
 
 // openDB returns a maxminddb.Reader.
@@ -125,19 +123,4 @@ func openDB(path string) (*maxminddb.Reader, error) {
 	}
 
 	return db, nil
-}
-
-// RecordToString converts an mmdb record into a JSON-formatted string.
-func RecordToString(record []RecordSet) (string, error) {
-	var buf bytes.Buffer
-	enc := json.NewEncoder(&buf)
-	enc.SetEscapeHTML(false) // don't escape ampersands and angle brackets
-	enc.SetIndent("", "    ")
-
-	err := enc.Encode(record)
-	if err != nil {
-		return "", errors.New("could not convert record to string")
-	}
-
-	return buf.String(), nil
 }
