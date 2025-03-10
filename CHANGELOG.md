@@ -16,6 +16,8 @@
   matches, it will be treated as if multiple `-db` arguments were provided.
   Note that you must quote the parameter when using globs to prevent the
   shell's globbing from interfering. See the [pattern syntax](https://pkg.go.dev/path#Match)
+* You may now include networks with no data in the output by using the
+  `include-networks-without-data` flag.
 * This repo no longer provides a public Go API. It is only intended to be
   used as a CLI program.
 

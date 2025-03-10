@@ -28,10 +28,17 @@ func main() {
 	var mmdb arrayFlags
 
 	flag.Var(&mmdb, "db", "Path to an mmdb file. You may pass this arg more than once.")
+
 	includeAliasedNetworks := flag.Bool(
 		"include-aliased-networks",
 		false,
 		"Include aliased networks (e.g. 6to4, Teredo). This option may cause IPv4 networks to be listed more than once via aliases.", //nolint: lll
+	)
+
+	includeNetworksWithoutData := flag.Bool(
+		"include-networks-without-data",
+		false,
+		`Include networks that have no data in the database. The "record" will be null for these.`,
 	)
 
 	useJSONL := flag.Bool("jsonl", false, "Output as JSONL instead of YAML.")
@@ -65,7 +72,12 @@ func main() {
 		encoder = yaml.NewEncoder(w)
 	}
 
-	iterator := records(network, mmdb, *includeAliasedNetworks)
+	iterator := records(
+		network,
+		mmdb,
+		*includeAliasedNetworks,
+		*includeNetworksWithoutData,
+	)
 
 	for r, err := range iterator {
 		if err != nil {

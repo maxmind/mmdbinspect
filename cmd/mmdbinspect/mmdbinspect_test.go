@@ -141,11 +141,12 @@ var country81_2_69_142 = map[string]any{
 
 func TestRecords(t *testing.T) {
 	tests := []struct {
-		name          string
-		dbs           []string
-		networks      []string
-		expectRecords []record
-		expectErr     string
+		name                       string
+		dbs                        []string
+		networks                   []string
+		includeNetworksWithoutData bool
+		expectRecords              []record
+		expectErr                  string
 	}{
 		{
 			name:     "multiple non-glob paths and multiple IPs",
@@ -186,9 +187,22 @@ func TestRecords(t *testing.T) {
 			},
 		},
 		{
-			name:     "network missing from DB",
+			name:     "network missing from DB without including empty networks",
 			dbs:      []string{CityDBPath},
 			networks: []string{"10.0.0.0"},
+		},
+		{
+			name:                       "network missing from DB with including empty networks",
+			dbs:                        []string{CityDBPath},
+			networks:                   []string{"10.0.0.0"},
+			includeNetworksWithoutData: true,
+			expectRecords: []record{
+				{
+					DatabasePath:    CityDBPath,
+					RequestedLookup: "10.0.0.0",
+					Network:         netip.MustParsePrefix("10.0.0.0/8"),
+				},
+			},
 		},
 		{
 			name:      "file does not exist",
@@ -213,7 +227,7 @@ func TestRecords(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			var recs []record
-			for record, err := range records(test.networks, test.dbs, false) {
+			for record, err := range records(test.networks, test.dbs, false, test.includeNetworksWithoutData) {
 				// For now, we don't test errors that happen half way through an
 				// iteration. If we want to in the future, we will need to rework
 				// this a bit.

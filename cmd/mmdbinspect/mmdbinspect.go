@@ -18,15 +18,24 @@ type record struct {
 	DatabasePath    string       `json:"database_path"`
 	RequestedLookup string       `json:"requested_lookup"`
 	Network         netip.Prefix `json:"network"`
-	Record          any          `json:"record"`
+	Record          any          `json:"record,omitempty"`
 }
 
 // records returns an iterator over the records for the networks and
 // databases provided.
 func records(
 	networks, databases []string,
-	includeAliasedNetworks bool,
+	includeAliasedNetworks,
+	includeNetworksWithoutData bool,
 ) iter.Seq2[*record, error] {
+	var opts []maxminddb.NetworksOption
+	if includeAliasedNetworks {
+		opts = append(opts, maxminddb.IncludeAliasedNetworks)
+	}
+	if includeNetworksWithoutData {
+		opts = append(opts, maxminddb.IncludeNetworksWithoutData)
+	}
+
 	return func(yield func(*record, error) bool) {
 		for _, glob := range databases {
 			matches, err := filepath.Glob(glob)
@@ -46,7 +55,7 @@ func records(
 						DatabasePath:    path,
 						RequestedLookup: thisNetwork,
 					}
-					ok := recordsForNetwork(reader, includeAliasedNetworks, baseRecord, yield)
+					ok := recordsForNetwork(reader, opts, baseRecord, yield)
 					if !ok {
 						return
 					}
@@ -62,7 +71,7 @@ func records(
 // network containing a single address (i.e., /32 for IPv4 and /128 for IPv6).
 func recordsForNetwork(
 	reader *maxminddb.Reader,
-	includeAliasedNetworks bool,
+	opts []maxminddb.NetworksOption,
 	record record,
 	yield func(*record, error) bool,
 ) bool {
@@ -87,11 +96,6 @@ func recordsForNetwork(
 		}
 
 		network = netip.PrefixFrom(addr, bits)
-	}
-
-	var opts []maxminddb.NetworksOption
-	if includeAliasedNetworks {
-		opts = append(opts, maxminddb.IncludeAliasedNetworks)
 	}
 
 	for res := range reader.NetworksWithin(network, opts...) {
