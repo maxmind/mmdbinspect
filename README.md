@@ -24,10 +24,19 @@
 ## Usage
 
 ```bash
-mmdbinspect -db <path/to/your.mmdb> <IP|network>
-  db            Path to a MMDB file. Can be specified multiple times.
-  <IP|network>  An IP address, or network in CIDR notation. Can be
-                specified multiple times.
+mmdbinspect [-include-aliased-networks] [-include-build-time] [-include-networks-without-data] [-jsonl] -db path/to/db [IP|network] [IP|network]...
+  -db value            Path to an mmdb file. You may pass this arg more than once.
+                       This may also be a glob pattern matching one or more MMDB files.
+  -include-aliased-networks
+                       Include aliased networks (e.g. 6to4, Teredo). This option may
+                       cause IPv4 networks to be listed more than once via aliases.
+  -include-build-time  Include the build time of the database in the output.
+  -include-networks-without-data
+                       Include networks that have no data in the database.
+                       The "record" will be null for these.
+  -jsonl               Output as JSONL instead of YAML.
+  [IP|network]         An IP address, or network in CIDR notation. Can be
+                       specified multiple times.
 ```
 
 ## Description
@@ -36,7 +45,7 @@ Any IPs specified will be treated as their single-host network counterparts (e.g
 
 `mmdbinspect` will look up each IP/network in each database specified. For each IP/network looked up in a database, the program will select all records for networks which are contained within the looked up IP/network. If no records for contained networks are found in the datafile, the program will select the record that is contained by the looked up IP/network. If no such records are found, none are selected.
 
-The program outputs the selected records as a JSON array, with each item in the array corresponding to a single IP/network being looked up in a single DB. The `database` and `requested_lookup` keys are added to each item to help correlate which set of records resulted from looking up which IP/network in which database.
+The program outputs the selected records in YAML format by default (use `-jsonl` for JSONL format). Each output item corresponds to a single IP/network being looked up in a single DB. Each record contains the following keys: `database_path`, `requested_lookup`, `network`, and `record`. This format allows for efficient streaming of large lookups and makes the key naming more consistent.
 
 ## Beta Release
 
@@ -284,6 +293,35 @@ record:
 </details>
 
 <details>
+    <summary>Using glob patterns to match multiple database files</summary>
+
+```bash
+$ mmdbinspect -db "GeoIP2-*.mmdb" 152.216.7.110
+database_path: GeoIP2-Country.mmdb
+requested_lookup: 152.216.7.110
+network: 152.208.0.0/12
+record:
+  continent:
+    code: NA
+    geoname_id: 6255149
+    names:
+      de: Nordamerika
+      en: North America
+      # ... more names
+  country:
+    geoname_id: 6252001
+    iso_code: US
+    # ... more country data
+---
+database_path: GeoIP2-City.mmdb
+requested_lookup: 152.216.7.110
+network: 152.216.4.0/22
+record:
+  # ... city data
+```
+</details>
+
+<details>
     <summary>Look up a file of IPs/networks using the <code>xargs</code> utility</summary>
 
 ```bash
@@ -312,7 +350,7 @@ record:
 </details>
 
 <details>
-<summary>Tame the output with the <code>-jsonl</code> flag and the <code>jq</code> utility</summary>
+<summary>Processing the output with the <code>-jsonl</code> flag and the <code>jq</code> utility</summary>
 
 Print out the `isp` field from each result found:
 ```bash
@@ -344,6 +382,16 @@ $ mmdbinspect -jsonl -db GeoLite2-ASN.mmdb 152.216.7.49 | jq -r '.record.autonom
 30313
 ```
 
+Create a CSV file with network and country code for all networks with data:
+```bash
+$ echo "network,country" > networks.csv
+$ mmdbinspect -jsonl -db GeoIP2-Country.mmdb ::/0 | jq -r '[.network, .record.country.iso_code] | join(",")' >> networks.csv
+$ cat networks.csv
+network,country
+1.1.1.0/24,AU
+...
+```
+
 When asking `jq` to print a path it can't find, it'll print `null`:
 ```bash
 $ mmdbinspect -jsonl -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.invalid.path'
@@ -356,6 +404,35 @@ $ mmdbinspect -jsonl -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.record | .city.
 , United States
 $ mmdbinspect -jsonl -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.record | [.city.names.en, .country.names.en] | join(", ")'
 , United States
+```
+</details>
+
+<details>
+<summary>Using the `-include-*` flags for additional information</summary>
+
+Include build time information:
+```bash
+$ mmdbinspect -db GeoIP2-City.mmdb -include-build-time 152.216.7.110
+database_path: GeoIP2-City.mmdb
+build_time: 2023-01-15T12:34:56Z
+requested_lookup: 152.216.7.110
+network: 152.216.4.0/22
+record:
+  # ... city data
+```
+
+Include networks without data:
+```bash
+$ mmdbinspect -db GeoIP2-City.mmdb -include-networks-without-data 192.0.2.1
+database_path: GeoIP2-City.mmdb
+requested_lookup: 192.0.2.1
+network: 192.0.2.0/24
+```
+
+Include aliased networks:
+```bash
+$ mmdbinspect -db GeoIP2-City.mmdb -include-aliased-networks ::/0
+# ... All IPs in the database, including all aliased networks.
 ```
 </details>
 
