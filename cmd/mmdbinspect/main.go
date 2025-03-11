@@ -3,14 +3,11 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"strings"
-
-	"github.com/goccy/go-yaml"
 )
 
 type arrayFlags []string
@@ -53,9 +50,9 @@ func main() {
 	flag.Parse()
 
 	// Any remaining arguments (not passed via flags) should be networks
-	network := flag.Args()
+	networks := flag.Args()
 
-	if len(network) == 0 {
+	if len(networks) == 0 {
 		fmt.Println("You must provide at least one network address")
 		usage()
 		os.Exit(1)
@@ -69,34 +66,17 @@ func main() {
 
 	w := os.Stdout
 
-	var encoder interface {
-		Encode(any) error
-	}
-	if *useJSONL {
-		enc := json.NewEncoder(w)
-		enc.SetEscapeHTML(false) // don't escape ampersands and angle brackets
-		encoder = enc
-	} else {
-		encoder = yaml.NewEncoder(w)
-	}
-
-	iterator := records(
-		network,
+	err := process(
+		w,
+		*useJSONL,
+		networks,
 		mmdb,
 		*includeAliasedNetworks,
 		*includeBuildTime,
 		*includeNetworksWithoutData,
 	)
-
-	for r, err := range iterator {
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		err = encoder.Encode(r)
-		if err != nil {
-			log.Fatal(fmt.Errorf("encoding record: %w", err))
-		}
+	if err != nil {
+		log.Fatal(err)
 	}
 }
 
