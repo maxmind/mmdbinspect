@@ -2,8 +2,27 @@
 
 ## 2.0.0
 
-* Upgrade to `github.com/oschwald/maxminddb-golang/v2`. This is a breaking
-  API change, but should not affect the use of the program.
+* The default output format is now YAML. This was done to improve the
+  readability when using the tool as a standalone utility for doing lookups
+  in an MMDB database. Use the `-jsonl` flag to output as JSONL instead.
+* When outputting as JSON, we now use JSONL. There is one JSON object per
+  line.
+* The output format has been flattened. Each record that is output now
+  contains the following keys: `database_path`, `requested_lookup`,
+  `network`, and `record`. This allows for efficient streaming of large
+  lookups, makes the key naming more consistent, and reduces the depth of
+  the data structure.
+* You may now use a glob for the `-db` argument. If there are multiple
+  matches, it will be treated as if multiple `-db` arguments were provided.
+  Note that you must quote the parameter when using globs to prevent the
+  shell's globbing from interfering. See the [pattern syntax](https://pkg.go.dev/path#Match)
+* The following flags were added:
+  * `-include-networks-without-data` - include networks without any data in
+    the database in the output.
+  * `-include-build-time` - include the build time from the database's
+    metadata in the output.
+* This repo no longer provides a public Go API. It is only intended to be
+  used as a CLI program.
 
 ## 0.2.0 (2024-01-10)
 

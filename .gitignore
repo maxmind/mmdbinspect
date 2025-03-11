@@ -1,3 +1,4 @@
 /cover.*.gcov
 /cover.*.lcov
+/cmd/mmdbinspect/mmdbinspect
 /dist/**
