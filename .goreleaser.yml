@@ -10,7 +10,7 @@ before:
 
 builds:
   - id: 'mmdbinspect'
-    main: './cmd/mmdbinspect/main.go'
+    main: './cmd/mmdbinspect/'
     binary: 'mmdbinspect'
     goos:
       - 'darwin'
@@ -27,7 +27,8 @@ archives:
     wrap_in_directory: true
     format_overrides:
       - goos: windows
-        format: zip
+        formats:
+          - zip
     files:
       - 'CHANGELOG.md'
       - 'LICENSE-APACHE'
@@ -38,7 +39,7 @@ checksum:
   name_template: 'checksums.txt'
 
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  version_template: "{{ .Tag }}-next"
 
 changelog:
   disable: true

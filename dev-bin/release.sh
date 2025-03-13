@@ -5,7 +5,7 @@ set -eu -o pipefail
 changelog=$(cat CHANGELOG.md)
 
 regex='
-## ([0-9]+\.[0-9]+\.[0-9]+) \(([0-9]{4}-[0-9]{2}-[0-9]{2})\)
+## ([0-9]+\.[0-9]+\.[0-9]+(-[^ ]+)?) \(([0-9]{4}-[0-9]{2}-[0-9]{2})\)
 
 ((.|
 )*)
@@ -17,8 +17,8 @@ if [[ ! $changelog =~ $regex ]]; then
 fi
 
 version="${BASH_REMATCH[1]}"
-date="${BASH_REMATCH[2]}"
-notes="$(echo "${BASH_REMATCH[3]}" | sed -n -E '/^## [0-9]+\.[0-9]+\.[0-9]+/,$!p')"
+date="${BASH_REMATCH[3]}"
+notes="$(echo "${BASH_REMATCH[4]}" | sed -n -E '/^## [0-9]+\.[0-9]+\.[0-9]+(-[^ ]+)?/,$!p')"
 tag="v$version"
 
 if [[ "$date" != "$(date +"%Y-%m-%d")" ]]; then

@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## 2.0.0
+## 2.0.0-beta.2 (2025-03-11)
+
+* Fixes for the release scripts. No other changes.
+
+## 2.0.0-beta.1 (2025-03-11)
 
 * The default output format is now YAML. This was done to improve the
   readability when using the tool as a standalone utility for doing lookups
