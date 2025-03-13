@@ -408,7 +408,7 @@ $ mmdbinspect -jsonl -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.record | [.city
 </details>
 
 <details>
-<summary>Using the `-include-*` flags for additional information</summary>
+<summary>Using the <code>-include-*</code> flags for additional information</summary>
 
 Include build time information:
 ```bash
