@@ -385,10 +385,10 @@ $ mmdbinspect -jsonl -db GeoLite2-ASN.mmdb 152.216.7.49 | jq -r '.record.autonom
 Create a CSV file with network and country code for all networks with data:
 ```bash
 $ echo "network,country" > networks.csv
-$ mmdbinspect -jsonl -db GeoIP2-Country.mmdb ::/0 | jq -r '[.network, .record.country.iso_code] | join(",")' >> networks.csv
+$ mmdbinspect -jsonl -db GeoIP2-Country.mmdb ::/0 | jq -r '[.network, .record.country.iso_code] | @csv' >> networks.csv
 $ cat networks.csv
 network,country
-1.1.1.0/24,AU
+"1.1.1.0/24","AU"
 ...
 ```
 
