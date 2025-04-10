@@ -29,7 +29,7 @@ func main() {
 	includeAliasedNetworks := flag.Bool(
 		"include-aliased-networks",
 		false,
-		"Include aliased networks (e.g. 6to4, Teredo). This option may cause IPv4 networks to be listed more than once via aliases.", //nolint: lll
+		"Include aliased networks (e.g. 6to4, Teredo). This option may cause IPv4 networks to be listed more than once via aliases.",
 	)
 
 	includeBuildTime := flag.Bool(
@@ -82,7 +82,7 @@ func main() {
 
 func usage() {
 	fmt.Printf(
-		"Usage: %s [-include-aliased-networks] -db path/to/db -db path/to/other/db 130.113.64.30/24 0:0:0:0:0:ffff:8064:a678\n", //nolint: lll
+		"Usage: %s [-include-aliased-networks] -db path/to/db -db path/to/other/db 130.113.64.30/24 0:0:0:0:0:ffff:8064:a678\n",
 		os.Args[0],
 	)
 	flag.PrintDefaults()
