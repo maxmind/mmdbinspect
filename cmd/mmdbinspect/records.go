@@ -34,10 +34,10 @@ func records(
 ) iter.Seq2[*record, error] {
 	var opts []maxminddb.NetworksOption
 	if includeAliasedNetworks {
-		opts = append(opts, maxminddb.IncludeAliasedNetworks)
+		opts = append(opts, maxminddb.IncludeAliasedNetworks())
 	}
 	if includeNetworksWithoutData {
-		opts = append(opts, maxminddb.IncludeNetworksWithoutData)
+		opts = append(opts, maxminddb.IncludeNetworksWithoutData())
 	}
 
 	return func(yield func(*record, error) bool) {
