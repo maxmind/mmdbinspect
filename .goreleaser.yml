@@ -16,9 +16,23 @@ builds:
       - 'darwin'
       - 'linux'
       - 'windows'
+    goarch:
+      - 'amd64'
+      - '386'
+      - 'arm64'
+      - 'arm'
+    goarm:
+      - '6'
+      - '7'
     ignore:
       - goos: 'darwin'
         goarch: '386'
+      - goos: 'darwin'
+        goarch: 'arm'
+      - goos: 'windows'
+        goarch: 'arm'
+      - goos: 'windows'
+        goarch: 'arm64'
 
 archives:
   - id: 'mmdbinspect'

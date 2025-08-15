@@ -14,6 +14,8 @@
     * [Installing on RedHat or CentOS via the rpm](#installing-on-redhat-or-centos-via-the-rpm)
     * [Installing on macOS (darwin) via the tarball](#installing-on-macos-darwin-via-the-tarball)
     * [Installing on Windows](#installing-on-windows)
+    * [Installing on 32-bit x86 systems](#installing-on-32-bit-x86-systems)
+    * [Installing on ARM devices (Raspberry Pi, etc.)](#installing-on-arm-devices-raspberry-pi-etc)
     * [Installing from source or Git](#installing-from-source-or-git)
 * [Examples](#examples)
 * [Bug Reports](#bug-reports)
@@ -88,6 +90,30 @@ This is the same as installing on Linux via the tarball, except choose a tarball
 Download and extract the appropriate zip for your system. You will end up with a directory named something like mmdbinspect_0.0.0_windows_amd64 depending on the version and architecture.
 
 Copy mmdbinspect.exe to where you want it to live.
+
+### Installing on 32-bit x86 systems
+
+32-bit x86 builds are available for both Linux and Windows:
+
+- `mmdbinspect_X.X.X_linux_386.tar.gz` - for 32-bit Linux x86 systems
+- `mmdbinspect_X.X.X_windows_386.zip` - for 32-bit Windows x86 systems
+
+Download and extract the appropriate archive, then install the same way as described in the Linux/Windows installation sections above.
+
+### Installing on ARM devices (Raspberry Pi, etc.)
+
+ARM builds are available for both 32-bit and 64-bit ARM processors:
+
+- **ARM64** (64-bit): For Raspberry Pi 4, Pi 5, and other ARM64 devices running 64-bit operating systems
+- **ARMv7** (32-bit): For Raspberry Pi 3, Pi 4 (32-bit OS), and other ARMv7 devices  
+- **ARMv6** (32-bit): For Raspberry Pi Zero, Pi 1, and other ARMv6 devices
+
+Download the appropriate tarball for your ARM device:
+- `mmdbinspect_X.X.X_linux_arm64.tar.gz` - for ARM64 devices
+- `mmdbinspect_X.X.X_linux_armv7.tar.gz` - for ARMv7 devices
+- `mmdbinspect_X.X.X_linux_armv6.tar.gz` - for ARMv6 devices
+
+Extract and install the same way as described in the Linux installation section above.
 
 ### Installing from source or Git
 
