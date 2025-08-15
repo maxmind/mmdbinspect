@@ -24,7 +24,7 @@
 ## Usage
 
 ```bash
-mmdbinspect [-include-aliased-networks] [-include-build-time] [-include-networks-without-data] [-jsonl] -db path/to/db [IP|network] [IP|network]...
+mmdbinspect [-include-aliased-networks] [-include-build-time] [-include-networks-without-data] [-jsonl] [-version] -db path/to/db [IP|network] [IP|network]...
   -db value            Path to an mmdb file. You may pass this arg more than once.
                        This may also be a glob pattern matching one or more MMDB files.
   -include-aliased-networks
@@ -35,6 +35,7 @@ mmdbinspect [-include-aliased-networks] [-include-build-time] [-include-networks
                        Include networks that have no data in the database.
                        The "record" will be null for these.
   -jsonl               Output as JSONL instead of YAML.
+  -version             Show version information.
   [IP|network]         An IP address, or network in CIDR notation. Can be
                        specified multiple times.
 ```
@@ -102,6 +103,15 @@ $ go install github.com/maxmind/mmdbinspect/v2/cmd/mmdbinspect@latest
 This installs `mmdbinspect` to `$GOPATH/bin/mmdbinspect`.
 
 ## Examples
+
+<details>
+    <summary>Check version</summary>
+
+```bash
+$ mmdbinspect -version
+0.2.0
+```
+</details>
 
 <details>
     <summary>A simple lookup (one IP/network, one DB)</summary>
