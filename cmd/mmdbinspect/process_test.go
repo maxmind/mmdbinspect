@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,15 +11,7 @@ import (
 func TestProcess(t *testing.T) {
 	// We switch directories so that we don't have to deal with path separator
 	// differences in the output.
-	// TODO: after we switch to Go 1.24, this can just be t.Chdir
-	originalDir, err := os.Getwd()
-	require.NoError(t, err)
-
-	defer func() {
-		require.NoError(t, os.Chdir(originalDir))
-	}()
-
-	require.NoError(t, os.Chdir(testDataDir))
+	t.Chdir(testDataDir)
 
 	tests := []struct {
 		name      string
