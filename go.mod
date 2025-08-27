@@ -5,7 +5,7 @@ go 1.24
 require (
 	github.com/goccy/go-yaml v1.18.0
 	github.com/oschwald/maxminddb-golang/v2 v2.0.0-beta.10
-	github.com/stretchr/testify v1.11.0
+	github.com/stretchr/testify v1.11.1
 )
 
 require (
