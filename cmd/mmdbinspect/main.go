@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+var version = "0.2.0"
+
 type arrayFlags []string
 
 func (i *arrayFlags) String() string {
@@ -46,8 +48,15 @@ func main() {
 
 	useJSONL := flag.Bool("jsonl", false, "Output as JSONL instead of YAML.")
 
+	showVersion := flag.Bool("version", false, "Show version information")
+
 	flag.Usage = usage
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(version)
+		os.Exit(0)
+	}
 
 	// Any remaining arguments (not passed via flags) should be networks
 	networks := flag.Args()
