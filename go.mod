@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/goccy/go-yaml v1.18.0
-	github.com/oschwald/maxminddb-golang/v2 v2.0.0
+	github.com/oschwald/maxminddb-golang/v2 v2.1.0
 	github.com/stretchr/testify v1.11.1
 )
 
