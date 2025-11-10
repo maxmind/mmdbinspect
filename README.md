@@ -24,13 +24,16 @@
 ## Usage
 
 ```bash
-mmdbinspect [-include-aliased-networks] [-include-build-time] [-include-networks-without-data] [-jsonl] -db path/to/db [IP|network] [IP|network]...
+mmdbinspect [-include-aliased-networks] [-include-build-time] [-include-empty-values] [-include-networks-without-data] [-jsonl] -db path/to/db [IP|network] [IP|network]...
   -db value            Path to an mmdb file. You may pass this arg more than once.
                        This may also be a glob pattern matching one or more MMDB files.
   -include-aliased-networks
                        Include aliased networks (e.g. 6to4, Teredo). This option may
                        cause IPv4 networks to be listed more than once via aliases.
   -include-build-time  Include the build time of the database in the output.
+  -include-empty-values
+                       Include networks whose data is an empty map or empty array.
+                       By default, such networks are skipped.
   -include-networks-without-data
                        Include networks that have no data in the database.
                        The "record" will be null for these.
@@ -44,6 +47,8 @@ mmdbinspect [-include-aliased-networks] [-include-build-time] [-include-networks
 Any IPs specified will be treated as their single-host network counterparts (e.g. 1.2.3.4 => 1.2.3.4/32).
 
 `mmdbinspect` will look up each IP/network in each database specified. For each IP/network looked up in a database, the program will select all records for networks which are contained within the looked up IP/network. If no records for contained networks are found in the datafile, the program will select the record that is contained by the looked up IP/network. If no such records are found, none are selected.
+
+By default, networks with empty map or empty array data are skipped from the output. This is useful for databases that use empty values for networks without meaningful data (e.g., public IPs in some databases). Use `-include-empty-values` to include these networks in the output.
 
 The program outputs the selected records in YAML format by default (use `-jsonl` for JSONL format). Each output item corresponds to a single IP/network being looked up in a single DB. Each record contains the following keys: `database_path`, `requested_lookup`, `network`, and `record`. This format allows for efficient streaming of large lookups and makes the key naming more consistent.
 

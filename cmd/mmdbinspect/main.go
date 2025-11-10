@@ -44,6 +44,12 @@ func main() {
 		`Include networks that have no data in the database. The "record" will be null for these.`,
 	)
 
+	includeEmptyValues := flag.Bool(
+		"include-empty-values",
+		false,
+		"Include networks whose data is an empty map or empty array.",
+	)
+
 	useJSONL := flag.Bool("jsonl", false, "Output as JSONL instead of YAML.")
 
 	flag.Usage = usage
@@ -74,6 +80,7 @@ func main() {
 		*includeAliasedNetworks,
 		*includeBuildTime,
 		*includeNetworksWithoutData,
+		*includeEmptyValues,
 	)
 	if err != nil {
 		log.Fatal(err)

@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## Unreleased
+
+* **BREAKING CHANGE**: Networks with empty map or empty array data are now
+  skipped by default. This makes the output cleaner when working with
+  databases that use empty values for networks without meaningful data (e.g.,
+  public IPs in some databases). Use the new `-include-empty-values` flag to
+  include these networks in the output.
+* Added `-include-empty-values` flag to optionally include networks whose data
+  is an empty map or empty array.
+
 ## 2.0.0-beta.2 (2025-03-11)
 
 * Fixes for the release scripts. No other changes.

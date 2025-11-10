@@ -48,6 +48,7 @@ func TestProcess(t *testing.T) {
 				false,
 				false,
 				false,
+				false,
 			)
 
 			require.NoError(t, err)

@@ -15,9 +15,10 @@ const (
 )
 
 var (
-	CityDBPath    = filepath.Join(testDataDir, "GeoIP2-City-Test.mmdb")
-	CountryDBPath = filepath.Join(testDataDir, "GeoIP2-Country-Test.mmdb")
-	ISPDBPath     = filepath.Join(testDataDir, "GeoIP2-ISP-Test.mmdb")
+	CityDBPath        = filepath.Join(testDataDir, "GeoIP2-City-Test.mmdb")
+	CountryDBPath     = filepath.Join(testDataDir, "GeoIP2-Country-Test.mmdb")
+	ISPDBPath         = filepath.Join(testDataDir, "GeoIP2-ISP-Test.mmdb")
+	AnonymousIPDBPath = filepath.Join(testDataDir, "GeoIP2-Anonymous-IP-Test.mmdb")
 )
 
 var city81_2_69_142 = map[string]any{
@@ -149,6 +150,7 @@ func TestRecords(t *testing.T) {
 		networks                   []string
 		includeBuildTime           bool
 		includeNetworksWithoutData bool
+		includeEmptyValues         bool
 		expectRecords              []record
 		expectErr                  string
 	}{
@@ -224,6 +226,50 @@ func TestRecords(t *testing.T) {
 			},
 		},
 		{
+			name:     "skip empty values by default",
+			dbs:      []string{AnonymousIPDBPath},
+			networks: []string{"1.0.0.0/8"},
+			// Without includeEmptyValues, we only get records with non-empty data.
+			// The Anonymous-IP database has many networks with empty maps that
+			// should be skipped by default.
+			expectRecords: []record{
+				{
+					DatabasePath:    AnonymousIPDBPath,
+					RequestedLookup: "1.0.0.0/8",
+					Network:         netip.MustParsePrefix("1.2.0.0/16"),
+					Record: map[string]any{
+						"is_anonymous":     true,
+						"is_anonymous_vpn": true,
+					},
+				},
+				{
+					DatabasePath:    AnonymousIPDBPath,
+					RequestedLookup: "1.0.0.0/8",
+					Network:         netip.MustParsePrefix("1.124.213.1/32"),
+					Record: map[string]any{
+						"is_anonymous":     true,
+						"is_anonymous_vpn": true,
+						"is_tor_exit_node": true,
+					},
+				},
+			},
+		},
+		{
+			name:               "include empty values when flag is set",
+			dbs:                []string{AnonymousIPDBPath},
+			networks:           []string{"1.0.0.0/15"},
+			includeEmptyValues: true,
+			// With includeEmptyValues, we should see the empty map record
+			expectRecords: []record{
+				{
+					DatabasePath:    AnonymousIPDBPath,
+					RequestedLookup: "1.0.0.0/15",
+					Network:         netip.MustParsePrefix("1.0.0.0/15"),
+					Record:          map[string]any{},
+				},
+			},
+		},
+		{
 			name:      "file does not exist",
 			dbs:       []string{"does/not/exist.mmdb"},
 			networks:  []string{"81.2.69.142"},
@@ -252,6 +298,7 @@ func TestRecords(t *testing.T) {
 				false,
 				test.includeBuildTime,
 				test.includeNetworksWithoutData,
+				test.includeEmptyValues,
 			)
 			for record, err := range iterator {
 				// For now, we don't test errors that happen half way through an
