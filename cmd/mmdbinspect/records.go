@@ -30,7 +30,8 @@ func records(
 	networks, databases []string,
 	includeAliasedNetworks,
 	includeBuildTime,
-	includeNetworksWithoutData bool,
+	includeNetworksWithoutData,
+	includeEmptyValues bool,
 ) iter.Seq2[*record, error] {
 	var opts []maxminddb.NetworksOption
 	if includeAliasedNetworks {
@@ -38,6 +39,9 @@ func records(
 	}
 	if includeNetworksWithoutData {
 		opts = append(opts, maxminddb.IncludeNetworksWithoutData())
+	}
+	if !includeEmptyValues {
+		opts = append(opts, maxminddb.SkipEmptyValues())
 	}
 
 	return func(yield func(*record, error) bool) {

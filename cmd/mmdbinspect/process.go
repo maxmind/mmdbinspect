@@ -14,7 +14,8 @@ func process(
 	networks, databases []string,
 	includeAliasedNetworks,
 	includeBuildTime,
-	includeNetworksWithoutData bool,
+	includeNetworksWithoutData,
+	includeEmptyValues bool,
 ) error {
 	var encoder interface {
 		Encode(any) error
@@ -34,6 +35,7 @@ func process(
 		includeAliasedNetworks,
 		includeBuildTime,
 		includeNetworksWithoutData,
+		includeEmptyValues,
 	)
 
 	for r, err := range iterator {
