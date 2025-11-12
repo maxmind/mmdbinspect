@@ -6,7 +6,6 @@
 
 * [Usage](#usage)
 * [Description](#description)
-* [Beta Release](#beta-release)
 * [Installation](#installation)
     * [Installing via binary release](#installing-via-binary-release)
     * [Installing on Linux via the tarball](#installing-on-linux-via-the-tarball)
@@ -51,10 +50,6 @@ Any IPs specified will be treated as their single-host network counterparts (e.g
 By default, networks with empty map or empty array data are skipped from the output. This is useful for databases that use empty values for networks without meaningful data (e.g., public IPs in some databases). Use `-include-empty-values` to include these networks in the output.
 
 The program outputs the selected records in YAML format by default (use `-jsonl` for JSONL format). Each output item corresponds to a single IP/network being looked up in a single DB. Each record contains the following keys: `database_path`, `requested_lookup`, `network`, and `record`. This format allows for efficient streaming of large lookups and makes the key naming more consistent.
-
-## Beta Release
-
-This software is in beta. No guarantees are made, including relating to interface stability. Comments or suggestions for improvements are welcome on our [GitHub issue tracker](https://github.com/maxmind/mmdbinspect/issues).
 
 ## Installation
 

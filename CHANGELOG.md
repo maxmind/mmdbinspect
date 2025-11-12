@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 2.0.0 (2025-11-12)
 
 * **BREAKING CHANGE**: Networks with empty map or empty array data are now
   skipped by default. This makes the output cleaner when working with
