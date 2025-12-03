@@ -60,7 +60,6 @@ func records(
 
 				var buildTime *time.Time
 				if includeBuildTime {
-					//nolint:gosec // not a security issue.
 					t := time.Unix(int64(reader.Metadata.BuildEpoch), 0).UTC()
 					buildTime = &t
 				}
