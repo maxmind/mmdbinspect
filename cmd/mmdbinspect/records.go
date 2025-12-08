@@ -60,6 +60,7 @@ func records(
 
 				var buildTime *time.Time
 				if includeBuildTime {
+					//nolint:gosec // BuildEpoch is a Unix timestamp, won't overflow
 					t := time.Unix(int64(reader.Metadata.BuildEpoch), 0).UTC()
 					buildTime = &t
 				}
