@@ -3,7 +3,7 @@ module github.com/maxmind/mmdbinspect/v2
 go 1.24.0
 
 require (
-	github.com/goccy/go-yaml v1.19.1
+	github.com/goccy/go-yaml v1.19.2
 	github.com/oschwald/maxminddb-golang/v2 v2.1.1
 	github.com/stretchr/testify v1.11.1
 )
