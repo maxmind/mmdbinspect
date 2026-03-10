@@ -19,3 +19,12 @@ ignore-stderr = ".*"
 invoke = "once"
 path-args = "dir"
 include = ["**/*.go"]
+
+[commands.prettier-markdown]
+type = "both"
+cmd = ["prettier", "--prose-wrap", "always"]
+lint-flags = ["--check"]
+tidy-flags = ["--write"]
+path-args = "absolute-file"
+include = "**/*.md"
+ok-exit-codes = 0
