@@ -7,6 +7,7 @@ disable_backends = [
 
 [tools]
 go = "latest"
+lychee = "latest"
 "github:golangci/golangci-lint" = "latest"
 "github:houseabsolute/precious" = "latest"
 node = "latest"
@@ -18,3 +19,7 @@ enter = "mise install --quiet"
 [[watch_files]]
 patterns = ["mise.toml", "mise.lock"]
 run = "mise install --quiet"
+
+[tasks.check-links]
+description = "Check links with lychee"
+run = "lychee --no-progress './**/*.md' './**/*.go'"

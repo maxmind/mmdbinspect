@@ -119,7 +119,7 @@ Copy mmdbinspect.exe to where you want it to live.
 ### Installing from source or Git
 
 _We aim always to support the current and penultimate major releases of the Go
-compiler. You can get it at the [Go website](https://golang.org)._
+compiler. You can get it at the [Go website](https://go.dev/)._
 
 The easiest way is via `go install`:
 

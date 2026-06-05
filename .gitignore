@@ -3,3 +3,4 @@
 /cover.*.lcov
 /cmd/mmdbinspect/mmdbinspect
 /dist/**
+/.lycheecache
