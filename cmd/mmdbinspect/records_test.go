@@ -49,9 +49,8 @@ var city81_2_69_142 = map[string]any{
 		},
 	},
 	"country": map[string]any{
-		"geoname_id":           uint64(2635167),
-		"is_in_european_union": true,
-		"iso_code":             "GB",
+		"geoname_id": uint64(2635167),
+		"iso_code":   "GB",
 		"names": map[string]any{
 			"de":    "Vereinigtes Königreich",
 			"en":    "United Kingdom",
@@ -111,9 +110,8 @@ var country81_2_69_142 = map[string]any{
 		},
 	},
 	"country": map[string]any{
-		"geoname_id":           uint64(2635167),
-		"is_in_european_union": true,
-		"iso_code":             "GB",
+		"geoname_id": uint64(2635167),
+		"iso_code":   "GB",
 		"names": map[string]any{
 			"de":    "Vereinigtes Königreich",
 			"en":    "United Kingdom",
