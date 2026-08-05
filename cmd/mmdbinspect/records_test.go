@@ -140,7 +140,7 @@ var country81_2_69_142 = map[string]any{
 }
 
 func TestRecords(t *testing.T) {
-	countryBuildTime := time.Date(2019, 11, 4, 16, 30, 59, 0, time.UTC)
+	countryBuildTime := time.Date(2026, 2, 4, 22, 49, 29, 0, time.UTC)
 
 	tests := []struct {
 		name                       string
