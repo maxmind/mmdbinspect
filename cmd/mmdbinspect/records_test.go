@@ -140,7 +140,7 @@ var country81_2_69_142 = map[string]any{
 }
 
 func TestRecords(t *testing.T) {
-	countryBuildTime := time.Date(2026, 2, 4, 22, 49, 29, 0, time.UTC)
+	countryBuildTime := dbBuildTime(t, CountryDBPath)
 
 	tests := []struct {
 		name                       string
@@ -179,7 +179,7 @@ func TestRecords(t *testing.T) {
 			expectRecords: []record{
 				{
 					DatabasePath:    CountryDBPath,
-					BuildTime:       &countryBuildTime,
+					BuildTime:       countryBuildTime,
 					RequestedLookup: "81.2.69.142",
 					Network:         netip.MustParsePrefix("81.2.69.142/31"),
 					Record:          country81_2_69_142,
@@ -316,4 +316,23 @@ func TestRecords(t *testing.T) {
 			assert.Equal(t, test.expectRecords, recs)
 		})
 	}
+}
+
+// dbBuildTime returns the build time recorded in a database's metadata. The
+// test databases are regenerated periodically, so the expectation has to come
+// from the database itself rather than a literal.
+func dbBuildTime(t *testing.T, path string) *time.Time {
+	t.Helper()
+
+	reader, err := openDB(path)
+	require.NoError(t, err)
+	defer func() {
+		require.NoError(t, reader.Close())
+	}()
+
+	require.NotZero(t, reader.Metadata.BuildEpoch)
+
+	buildTime := reader.Metadata.BuildTime().UTC()
+
+	return &buildTime
 }
