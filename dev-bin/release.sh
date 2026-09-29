@@ -94,4 +94,11 @@ fi
 
 git push
 
-gh release create --target "$(git branch --show-current)" -t "$version" -n "$notes" "$tag"
+# The tag message is the version, a blank line, and the release notes. The
+# Release workflow uses the notes for the GitHub release. "verbatim" keeps any
+# "#" lines, which git would otherwise strip as comments.
+git tag -a --cleanup=verbatim -m "$version
+
+$notes" "$tag"
+
+git push origin "$tag"

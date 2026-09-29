@@ -6,13 +6,15 @@ on:
   push:
     branches:
       - main
-  release:
-    types:
-      - published
+    tags:
+      - 'v*'
+
+permissions: {}
 
 jobs:
   goreleaser:
-    if: github.event_name == 'release' && github.event.action == 'published'
+    name: Release with GoReleaser
+    if: github.event_name == 'push' && github.ref_type == 'tag'
     runs-on: ubuntu-latest
     environment: release
     permissions:
@@ -23,6 +25,23 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+
+      # On a tag push, actions/checkout replaces the annotated tag with a
+      # lightweight tag. Fetch the tags again to get the tag message.
+      - name: Fetch annotated tags
+        run: git fetch --force --tags
+
+      - name: Get release notes from the tag
+        run: |
+          if [ "$(git cat-file -t "$GITHUB_REF_NAME")" != tag ]; then
+            echo "Tag $GITHUB_REF_NAME is not an annotated tag. Create it with dev-bin/release.sh."
+            exit 1
+          fi
+          git tag -l --format='%(contents:body)' "$GITHUB_REF_NAME" > "$RUNNER_TEMP/release-notes.md"
+          if ! grep -q '[^[:space:]]' "$RUNNER_TEMP/release-notes.md"; then
+            echo "Tag $GITHUB_REF_NAME has no release notes. Create it with dev-bin/release.sh."
+            exit 1
+          fi
 
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
@@ -35,6 +54,6 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --clean
+          args: release --clean --release-notes ${{ runner.temp }}/release-notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

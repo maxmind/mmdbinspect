@@ -68,4 +68,4 @@ nfpms:
         dst: '/usr/share/doc/mmdbinspect/README.md'
 
 release:
-  target_commitish: "{{ .FullCommit }}"
+  name_template: "{{.Version}}"
