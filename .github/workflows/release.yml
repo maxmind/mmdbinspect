@@ -59,7 +59,7 @@ jobs:
 
       - name: Get release notes from the tag
         run: |
-          if [ "$(git cat-file -t "$GITHUB_REF_NAME")" != tag ]; then
+          if [ "$(git cat-file -t "refs/tags/$GITHUB_REF_NAME")" != tag ]; then
             echo "Tag $GITHUB_REF_NAME is not an annotated tag. Create it with dev-bin/release.sh."
             exit 1
           fi
@@ -83,3 +83,4 @@ jobs:
           args: release --clean --release-notes ${{ runner.temp }}/release-notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ github.ref_name }}
