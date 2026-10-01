@@ -41,9 +41,6 @@ checksum:
 snapshot:
   version_template: "{{ .Tag }}-next"
 
-changelog:
-  disable: true
-
 nfpms:
   - id: 'mmdbinspect'
     builds:
@@ -68,4 +65,4 @@ nfpms:
         dst: '/usr/share/doc/mmdbinspect/README.md'
 
 release:
-  target_commitish: "{{ .FullCommit }}"
+  name_template: "{{.Version}}"

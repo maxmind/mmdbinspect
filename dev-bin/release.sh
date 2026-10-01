@@ -69,6 +69,11 @@ date="${BASH_REMATCH[3]}"
 notes="$(echo "${BASH_REMATCH[4]}" | sed -n -E '/^## [0-9]+\.[0-9]+\.[0-9]+(-[^ ]+)?/,$!p')"
 tag="v$version"
 
+if ! grep -q '[^[:space:]]' <<<"$notes"; then
+    echo "Release notes for $tag are empty. Add notes to CHANGELOG.md." >&2
+    exit 1
+fi
+
 if [[ "$date" != "$(date +"%Y-%m-%d")" ]]; then
     echo "$date is not today!"
     exit 1
@@ -94,4 +99,10 @@ fi
 
 git push
 
-gh release create --target "$(git branch --show-current)" -t "$version" -n "$notes" "$tag"
+# The tag message is the version, a blank line, and the release notes.
+# "whitespace" keeps Markdown headings and adds a newline before a signature.
+git tag -a --cleanup=whitespace -m "$version
+
+$notes" "$tag"
+
+git push origin "refs/tags/$tag"
