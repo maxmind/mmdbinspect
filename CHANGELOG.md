@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.0.1
+
+- Fixed `-include-networks-without-data` showing the previous network's record
+  for a network without data. This happened in network lookups when the network
+  without data came after a network with data.
+
 ## 2.0.0 (2025-11-12)
 
 - **BREAKING CHANGE**: Networks with empty map or empty array data are now
