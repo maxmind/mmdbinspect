@@ -115,6 +115,8 @@ func recordsForNetwork(
 
 	for res := range reader.NetworksWithin(network, opts...) {
 		record.Network = res.Prefix()
+		// Decode leaves the target unchanged for networks without data.
+		record.Record = nil
 
 		err := res.Decode(&record.Record)
 		if err != nil {
