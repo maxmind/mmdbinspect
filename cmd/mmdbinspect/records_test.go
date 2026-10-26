@@ -19,6 +19,7 @@ var (
 	CountryDBPath     = filepath.Join(testDataDir, "GeoIP2-Country-Test.mmdb")
 	ISPDBPath         = filepath.Join(testDataDir, "GeoIP2-ISP-Test.mmdb")
 	AnonymousIPDBPath = filepath.Join(testDataDir, "GeoIP2-Anonymous-IP-Test.mmdb")
+	ASNDBPath         = filepath.Join(testDataDir, "GeoLite2-ASN-Test.mmdb")
 )
 
 var city81_2_69_142 = map[string]any{
@@ -220,6 +221,28 @@ func TestRecords(t *testing.T) {
 					DatabasePath:    CityDBPath,
 					RequestedLookup: "10.0.0.0",
 					Network:         netip.MustParsePrefix("10.0.0.0/8"),
+				},
+			},
+		},
+		{
+			name:                       "network without data after network with data",
+			dbs:                        []string{ASNDBPath},
+			networks:                   []string{"1.0.0.0/23"},
+			includeNetworksWithoutData: true,
+			expectRecords: []record{
+				{
+					DatabasePath:    ASNDBPath,
+					RequestedLookup: "1.0.0.0/23",
+					Network:         netip.MustParsePrefix("1.0.0.0/24"),
+					Record: map[string]any{
+						"autonomous_system_number":       uint64(15169),
+						"autonomous_system_organization": "Google Inc.",
+					},
+				},
+				{
+					DatabasePath:    ASNDBPath,
+					RequestedLookup: "1.0.0.0/23",
+					Network:         netip.MustParsePrefix("1.0.1.0/24"),
 				},
 			},
 		},
