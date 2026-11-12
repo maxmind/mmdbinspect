@@ -10,19 +10,30 @@ before:
 
 builds:
   - id: 'mmdbinspect'
+    env:
+      - 'CGO_ENABLED=0'
+    flags:
+      - '-trimpath'
     main: './cmd/mmdbinspect/'
     binary: 'mmdbinspect'
     goos:
       - 'darwin'
       - 'linux'
       - 'windows'
+    goarch:
+      - '386'
+      - 'amd64'
+      - 'arm'
+      - 'arm64'
+    goarm:
+      - '6'
     ignore:
       - goos: 'darwin'
         goarch: '386'
 
 archives:
   - id: 'mmdbinspect'
-    builds:
+    ids:
       - 'mmdbinspect'
     wrap_in_directory: true
     format_overrides:
@@ -43,7 +54,7 @@ snapshot:
 
 nfpms:
   - id: 'mmdbinspect'
-    builds:
+    ids:
       - 'mmdbinspect'
     vendor: 'MaxMind, Inc.'
     homepage: 'https://www.maxmind.com/'
