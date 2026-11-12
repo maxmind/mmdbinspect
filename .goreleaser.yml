@@ -10,6 +10,8 @@ before:
 
 builds:
   - id: 'mmdbinspect'
+    env:
+      - 'CGO_ENABLED=0'
     main: './cmd/mmdbinspect/'
     binary: 'mmdbinspect'
     goos:
