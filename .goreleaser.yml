@@ -31,7 +31,7 @@ builds:
 
 archives:
   - id: 'mmdbinspect'
-    builds:
+    ids:
       - 'mmdbinspect'
     wrap_in_directory: true
     format_overrides:
@@ -52,7 +52,7 @@ snapshot:
 
 nfpms:
   - id: 'mmdbinspect'
-    builds:
+    ids:
       - 'mmdbinspect'
     vendor: 'MaxMind, Inc.'
     homepage: 'https://www.maxmind.com/'
