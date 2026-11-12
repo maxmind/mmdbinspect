@@ -12,6 +12,8 @@ builds:
   - id: 'mmdbinspect'
     env:
       - 'CGO_ENABLED=0'
+    flags:
+      - '-trimpath'
     main: './cmd/mmdbinspect/'
     binary: 'mmdbinspect'
     goos:
