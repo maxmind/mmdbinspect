@@ -2,6 +2,12 @@
 
 ## 2.0.1
 
+- Updated `github.com/oschwald/maxminddb-golang/v2` from v2.1.0 to v2.9.0. This
+  fixes a denial of service from a crafted database,
+  [GHSA-hj94-g986-h9r7](https://github.com/maxmind/MaxMind-DB-Reader-python/security/advisories/GHSA-hj94-g986-h9r7).
+- The release binaries are built with the current Go release. The 2.0.0 binaries
+  used Go 1.25.4, which has known standard-library vulnerabilities.
+- The macOS binaries now require macOS 13 Ventura or later.
 - Fixed `-include-networks-without-data` showing the previous network's record
   for a network without data. This happened in network lookups when the network
   without data came after a network with data.
