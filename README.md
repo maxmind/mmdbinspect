@@ -423,6 +423,26 @@ $ mmdbinspect -jsonl -db GeoLite2-ASN.mmdb 152.216.7.49 | jq -r '.record.autonom
 30313
 ```
 
+Get the country code for an IP:
+
+```bash
+$ mmdbinspect -jsonl -db GeoIP2-Country.mmdb 152.216.7.110 | jq -r '.record.country.iso_code'
+US
+```
+
+Set shell variables from a record. The `@sh` format quotes each value for the
+shell, and `tostring` makes sure that each value is one string. The `// ""`
+operator sets an empty string when the record has no value. If the database has
+no record for the IP address, the command sets no variables, so clear them
+first:
+
+```bash
+$ country= city=
+$ eval "$(mmdbinspect -jsonl -db GeoIP2-City.mmdb 2610:30::1 | jq -r '.record | @sh "country=\(.country.iso_code // "" | tostring) city=\(.city.names.en // "" | tostring)"')"
+$ echo "$city, $country"
+Martinsburg, US
+```
+
 Create a CSV file with network and country code for all networks with data:
 
 ```bash
@@ -449,6 +469,13 @@ $ mmdbinspect -jsonl -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.record | .city.
 , United States
 $ mmdbinspect -jsonl -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.record | [.city.names.en, .country.names.en] | join(", ")'
 , United States
+```
+
+To print a default value for a path it can't find, use the `//` operator:
+
+```bash
+$ mmdbinspect -jsonl -db GeoIP2-City.mmdb 152.216.7.49 | jq -r '.record | (.city.names.en // "unknown") + ", " + .country.names.en'
+unknown, United States
 ```
 
 </details>
