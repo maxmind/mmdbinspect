@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.1.0
+## 2.1.0 (2026-11-12)
 
 - Updated `github.com/oschwald/maxminddb-golang/v2` from v2.1.0 to v2.9.0. This
   fixes a denial of service from a crafted database,
