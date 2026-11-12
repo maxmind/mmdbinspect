@@ -339,9 +339,6 @@ linters:
         - module: github.com/satori/go.uuid
           recommendations:
             - github.com/google/uuid
-        - module: github.com/google/uuid
-          recommendations:
-            - github.com/google/uuid
         - module: github.com/lib/pq
           recommendations:
             - github.com/jackc/pgx
