@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 2.0.1
+## 2.1.0
 
 - Updated `github.com/oschwald/maxminddb-golang/v2` from v2.1.0 to v2.9.0. This
   fixes a denial of service from a crafted database,
@@ -14,6 +14,8 @@
 - Added 32-bit ARM (`armv6`) builds for Linux, including `.deb` (`armhf`) and
   `.rpm` packages. They need an ARMv6 or later CPU with VFP, such as the
   Raspberry Pi 1 and Zero. GitHub #14.
+- Go 1.26 or later is now required to build from source. Version 2.0.0 required
+  Go 1.24.
 
 ## 2.0.0 (2025-11-12)
 
