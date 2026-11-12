@@ -5,6 +5,9 @@
 - Fixed `-include-networks-without-data` showing the previous network's record
   for a network without data. This happened in network lookups when the network
   without data came after a network with data.
+- Added 32-bit ARM (`armv6`) builds for Linux, including `.deb` (`armhf`) and
+  `.rpm` packages. They need an ARMv6 or later CPU with VFP, such as the
+  Raspberry Pi 1 and Zero. GitHub #14.
 
 ## 2.0.0 (2025-11-12)
 
